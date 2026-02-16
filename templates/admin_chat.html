@@ -1,0 +1,391 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+    :root {
+        --primary-color: #2563eb;
+        --secondary-color: #3b82f6;
+        --bg-primary: #ffffff;
+        --bg-secondary: #f3f4f6;
+        --text-primary: #111827;
+        --text-secondary: #6b7280;
+        --border-color: #e5e7eb;
+        --message-own: #2563eb;
+        --message-other: #f3f4f6;
+        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    }
+
+    .chat-wrapper {
+        max-width: 1200px;
+        margin: 2rem auto;
+        background: var(--bg-primary);
+        border-radius: 1rem;
+        box-shadow: var(--shadow-md);
+        overflow: hidden;
+    }
+
+    .chat-header {
+        background: var(--primary-color);
+        color: white;
+        padding: 1.5rem 2rem;
+    }
+
+    .chat-header h3 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin: 0 0 0.5rem 0;
+    }
+
+    .chat-header .chat-meta {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        font-size: 0.95rem;
+        opacity: 0.9;
+    }
+
+    .chat-header .room-info {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 0.25rem 0.75rem;
+        border-radius: 2rem;
+        font-size: 0.85rem;
+    }
+
+    .chat-messages {
+        height: 500px;
+        overflow-y: auto;
+        padding: 2rem;
+        background: var(--bg-secondary);
+    }
+
+    .message-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .message-item {
+        display: flex;
+        margin-bottom: 0.5rem;
+    }
+
+    .message-item.own-message {
+        justify-content: flex-end;
+    }
+
+    .message-bubble {
+        max-width: 70%;
+        padding: 0.75rem 1rem;
+        border-radius: 1rem;
+        position: relative;
+        word-wrap: break-word;
+    }
+
+    .own-message .message-bubble {
+        background: var(--message-own);
+        color: white;
+        border-bottom-right-radius: 0.25rem;
+    }
+
+    .other-message .message-bubble {
+        background: var(--message-other);
+        color: var(--text-primary);
+        border-bottom-left-radius: 0.25rem;
+    }
+
+    .message-sender {
+        font-size: 0.8rem;
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+        opacity: 0.8;
+    }
+
+    .own-message .message-sender {
+        color: rgba(255, 255, 255, 0.9);
+    }
+
+    .other-message .message-sender {
+        color: var(--text-secondary);
+    }
+
+    .message-content {
+        line-height: 1.4;
+    }
+
+    .message-time {
+        font-size: 0.7rem;
+        margin-top: 0.25rem;
+        text-align: right;
+        opacity: 0.7;
+    }
+
+    .own-message .message-time {
+        color: rgba(255, 255, 255, 0.8);
+    }
+
+    .other-message .message-time {
+        color: var(--text-secondary);
+    }
+
+    .chat-input-area {
+        padding: 1.5rem 2rem;
+        background: var(--bg-primary);
+        border-top: 1px solid var(--border-color);
+    }
+
+    .input-group {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+    }
+
+    .message-input {
+        flex: 1;
+        padding: 0.875rem 1.25rem;
+        border: 2px solid var(--border-color);
+        border-radius: 2rem;
+        font-size: 1rem;
+        transition: all 0.2s;
+        outline: none;
+    }
+
+    .message-input:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    .send-button {
+        background: var(--primary-color);
+        color: white;
+        border: none;
+        width: 3.5rem;
+        height: 3.5rem;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .send-button:hover {
+        background: var(--secondary-color);
+        transform: scale(1.05);
+        box-shadow: var(--shadow-md);
+    }
+
+    .send-button:active {
+        transform: scale(0.95);
+    }
+
+    .send-button svg {
+        width: 1.5rem;
+        height: 1.5rem;
+        fill: currentColor;
+    }
+
+    .typing-indicator {
+        padding: 0.5rem 0;
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        font-style: italic;
+        min-height: 2rem;
+    }
+
+    /* Scrollbar styling */
+    .chat-messages::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .chat-messages::-webkit-scrollbar-track {
+        background: var(--bg-secondary);
+    }
+
+    .chat-messages::-webkit-scrollbar-thumb {
+        background: var(--border-color);
+        border-radius: 3px;
+    }
+
+    .chat-messages::-webkit-scrollbar-thumb:hover {
+        background: var(--text-secondary);
+    }
+
+    /* Empty state */
+    .empty-messages {
+        text-align: center;
+        color: var(--text-secondary);
+        padding: 3rem;
+        font-style: italic;
+    }
+</style>
+
+<div class="chat-wrapper">
+    <div class="chat-header">
+        <h3>💬 Chat Support</h3>
+        <div class="chat-meta">
+            <span>Room: <span class="room-info">{{ room_id }}</span></span>
+            <span>Admin: <strong>{{ user_name }}</strong></span>
+        </div>
+    </div>
+
+    <div class="chat-messages" id="chatMessages">
+        <div id="messageList" class="message-list">
+            <!-- Messages will appear here -->
+        </div>
+    </div>
+
+    <div class="chat-input-area">
+        <div class="typing-indicator" id="typingIndicator"></div>
+        <div class="input-group">
+            <input 
+                type="text" 
+                id="messageInput" 
+                class="message-input" 
+                placeholder="Type your message here..."
+                autocomplete="off"
+            >
+            <button onclick="sendMessage()" class="send-button" id="sendButton">
+                <svg viewBox="0 0 24 24">
+                    <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+
+<script>
+    // Initialize socket connection
+    const socket = io();
+    const room = "{{ room_id }}";
+    const user = "{{ user_name }}";
+    
+    // DOM elements
+    const messageList = document.getElementById('messageList');
+    const messageInput = document.getElementById('messageInput');
+    const typingIndicator = document.getElementById('typingIndicator');
+    const chatMessages = document.getElementById('chatMessages');
+    
+    let typingTimer;
+    let isTyping = false;
+
+    // Socket connection
+    socket.on('connect', () => {
+        console.log('Connected to chat server');
+        socket.emit('join', { 
+            room: room, 
+            user: user 
+        });
+    });
+
+    // Receive message
+    socket.on('receive_message', (data) => {
+        addMessage(data.user, data.msg);
+        hideTypingIndicator();
+    });
+
+    // Typing indicator
+    socket.on('user_typing', (data) => {
+        if (data.user !== user) {
+            showTypingIndicator(data.user);
+        }
+    });
+
+    // Send message function
+    function sendMessage() {
+        const msg = messageInput.value.trim();
+        
+        if (msg === '') return;
+        
+        // Emit to server
+        socket.emit('send_message', {
+            room: room,
+            user: user,
+            message: msg
+        });
+        
+        // Clear input
+        messageInput.value = '';
+        
+        // Focus back on input
+        messageInput.focus();
+    }
+
+    // Add message to chat
+    function addMessage(sender, message) {
+        const messageElement = document.createElement('div');
+        messageElement.className = `message-item ${sender === user ? 'own-message' : 'other-message'}`;
+        
+        const time = new Date().toLocaleTimeString([], { 
+            hour: '2-digit', 
+            minute: '2-digit' 
+        });
+        
+        messageElement.innerHTML = `
+            <div class="message-bubble">
+                <div class="message-sender">${escapeHtml(sender)}</div>
+                <div class="message-content">${escapeHtml(message)}</div>
+                <div class="message-time">${time}</div>
+            </div>
+        `;
+        
+        messageList.appendChild(messageElement);
+        scrollToBottom();
+    }
+
+    // Typing indicator handlers
+    messageInput.addEventListener('input', () => {
+        if (!isTyping) {
+            isTyping = true;
+            socket.emit('typing', { 
+                room: room, 
+                user: user 
+            });
+            
+            // Reset typing status after 1 second of no input
+            clearTimeout(typingTimer);
+            typingTimer = setTimeout(() => {
+                isTyping = false;
+            }, 1000);
+        }
+    });
+
+    function showTypingIndicator(typingUser) {
+        typingIndicator.textContent = `${typingUser} is typing...`;
+    }
+
+    function hideTypingIndicator() {
+        typingIndicator.textContent = '';
+    }
+
+    // Send on Enter key
+    messageInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+        }
+    });
+
+    // Scroll to bottom
+    function scrollToBottom() {
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    // Escape HTML to prevent XSS
+    function escapeHtml(unsafe) {
+        return unsafe
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+    // Focus input on load
+    messageInput.focus();
+</script>
+
+{% endblock %}

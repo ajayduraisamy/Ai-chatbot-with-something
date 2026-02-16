@@ -284,7 +284,7 @@ def complaint():
 
 @app.route('/my_complaints')
 def my_complaints():
-    if 'email' not in session:
+    if 'email' not in session or 'role' not in session:
         flash('Please login to view your complaints.', 'warning')
         return redirect(url_for('login'))
 
@@ -452,10 +452,27 @@ def time_ago(value):
 
 
 
+# User Chat Route
+@app.route('/chat')
+def user_chat():
+    if 'email' not in session:
+        flash('Please login first.', 'warning')
+        return redirect(url_for('login'))
+
+    return render_template(
+        'user_chat.html',
+        room_id=session['email'],
+        user_name=session['name']
+    )
 
 
-# App secret key kitta ithai add pannunga
-socketio = SocketIO(app, cors_allowed_origins="*")
+
+socketio = SocketIO(
+    app,
+    cors_allowed_origins="*",
+    async_mode="threading"
+)
+
 
 # Admin Chat Route
 @app.route('/admin/chat/<user_email>')
@@ -465,15 +482,58 @@ def admin_chat(user_email):
         return redirect(url_for('login'))
     
     # room_id is user_email because it's unique
-    return render_template('admin_chat.html', room_id=user_email, user_name="Admin")
+    return render_template(
+     'admin_chat.html',
+     room_id=user_email,
+     user_name=session['name']
+)
+# Online Users Page (Admin)
+@app.route('/admin/online-users')
+def admin_online_users():
 
-# Socket Events
+    if 'email' not in session or session.get('role') != 'admin':
+        flash('Access denied.', 'danger')
+        return redirect(url_for('login'))
+
+    return render_template('online_users.html')
+
+@app.route('/admin/chat-list')
+def admin_chat_list():
+
+    if 'email' not in session or session.get('role') != 'admin':
+        flash('Access denied.', 'danger')
+        return redirect(url_for('login'))
+
+    conn = get_db_connection()
+
+    users = conn.execute("""
+        SELECT name, email
+        FROM users
+        WHERE role != 'admin'
+    """).fetchall()
+
+    conn.close()
+
+    return render_template(
+        'admin_chat_list.html',
+        users=users
+    )
+
 @socketio.on('join')
 def on_join(data):
     room = data['room']
+    user = data['user']
+
     join_room(room)
-    # Status message (Optional)
-    emit('status', {'msg': f"{data['user']} joined the conversation."}, room=room)
+
+    print(f"{user} joined room: {room}")
+
+    emit(
+        'status',
+        {'msg': f"{user} joined"},
+        room=room
+    )
+
 
 @socketio.on('send_message')
 def handle_message(data):
@@ -490,5 +550,12 @@ def logout():
     return redirect(url_for('login'))
 
 if __name__ == '__main__':
-    init_db()  
-    app.run(debug=True)
+    init_db()
+
+    socketio.run(
+        app,
+        host="127.0.0.1",
+        port=5000,
+        debug=True,
+        use_reloader=False
+    )

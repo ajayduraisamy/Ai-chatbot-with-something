@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h3 class="mb-4">Start Chat with User</h3>
+
+<div class="card p-3">
+
+    {% if users %}
+
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for u in users %}
+                <tr>
+                    <td>{{ u.name }}</td>
+                    <td>{{ u.email }}</td>
+
+                    <td>
+                        <a href="/admin/chat/{{ u.email }}"
+                           class="btn btn-sm btn-primary">
+                           Open Chat
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+
+            </tbody>
+        </table>
+
+    {% else %}
+
+        <p>No users found.</p>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

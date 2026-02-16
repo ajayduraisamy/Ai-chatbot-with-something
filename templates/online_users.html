@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>Online Users</h2>
+
+<table border="1" cellpadding="10">
+    <tr>
+        <th>User</th>
+        <th>Room</th>
+        <th>Action</th>
+    </tr>
+
+    {% for u in users %}
+    <tr>
+        <td>{{ u.user }}</td>
+        <td>{{ u.room }}</td>
+        <td>
+            <a href="/admin/chat/{{ u.room }}">Open Chat</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+{% endblock %}
