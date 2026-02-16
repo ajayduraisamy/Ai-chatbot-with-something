@@ -1,0 +1,1160 @@
+{% extends "base.html" %}
+{% block content %}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<div class="container py-5">
+
+  <!-- Header Section -->
+  <div class="dashboard-header mb-5">
+    <div class="d-flex justify-content-between align-items-center">
+      <div>
+        <h1 class="dashboard-title fw-bold">Edit Complaint</h1>
+        <p class="dashboard-subtitle">Update resolution and status for complaint #{{ complaint.id }}</p>
+      </div>
+      <div>
+        <span class="complaint-status-indicator status-{{ complaint.status }}">
+          <i class="fas 
+            {% if complaint.status == 'pending' %}fa-clock
+            {% elif complaint.status == 'in_progress' %}fa-spinner
+            {% else %}fa-check-circle{% endif %}
+            me-2"></i>
+          {{ complaint.status|replace('_', ' ')|title }}
+        </span>
+      </div>
+    </div>
+    <div class="header-border"></div>
+  </div>
+
+
+  <div class="row mb-5">
+    <div class="col-lg-12">
+      <div class="complaint-summary-card">
+        <div class="summary-header">
+          <div class="d-flex align-items-center justify-content-between">
+            <h3><i class="fas fa-file-alt me-3"></i>Complaint Details</h3>
+            <span class="complaint-id">ID: #{{ complaint.id }}</span>
+          </div>
+        </div>
+        <div class="summary-body">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="summary-item">
+                <label><i class="fas fa-heading me-2"></i>Title</label>
+                <p class="summary-value">{{ complaint.title }}</p>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="summary-item">
+                <label><i class="fas fa-user me-2"></i>Submitted By</label>
+                <p class="summary-value">{{ complaint.user_email }}</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="summary-item">
+            <label><i class="fas fa-align-left me-2"></i>Description</label>
+            <div class="description-box">
+              {{ complaint.description }}
+            </div>
+          </div>
+          
+          <div class="row">
+            <div class="col-md-6">
+              <div class="summary-item">
+                <label><i class="far fa-calendar me-2"></i>Submitted Date</label>
+                <p class="summary-value">
+                  {% if complaint.created_at is string %}
+                    {{ complaint.created_at }}
+                  {% else %}
+                    {{ complaint.created_at.strftime('%B %d, %Y at %I:%M %p') }}
+                  {% endif %}
+                </p>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="summary-item">
+                <label><i class="fas fa-clock me-2"></i>Last Updated</label>
+                <p class="summary-value">
+                  {% if complaint.updated_at %}
+                    {% if complaint.updated_at is string %}
+                      {{ complaint.updated_at }}
+                    {% else %}
+                      {{ complaint.updated_at.strftime('%B %d, %Y at %I:%M %p') }}
+                    {% endif %}
+                  {% else %}
+                    Never updated
+                  {% endif %}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    </div>
+
+  <div class="row">
+    <div class="col-lg-12">
+      <div class="premium-form-card">
+        <div class="form-card-header">
+          <div class="d-flex align-items-center">
+            <div class="form-icon">
+              <i class="fas fa-edit"></i>
+            </div>
+            <div>
+              <h3 class="form-title">Update Complaint Status</h3>
+              <p class="form-subtitle">Set resolution details and update complaint status</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="form-card-body">
+          <form method="POST" id="editComplaintForm">
+           
+            <div class="mb-4">
+              <label class="form-label-premium">
+                <i class="fas fa-info-circle me-2"></i>Current Status
+              </label>
+              <div class="current-status-display status-{{ complaint.status }}">
+                <div class="status-content">
+                  <i class="fas 
+                    {% if complaint.status == 'pending' %}fa-clock
+                    {% elif complaint.status == 'in_progress' %}fa-spinner
+                    {% else %}fa-check-circle{% endif %}
+                    me-3"></i>
+                  <div>
+                    <h5 class="mb-1">{{ complaint.status|replace('_', ' ')|title }}</h5>
+                    <p class="mb-0 text-muted">
+                      {% if complaint.status == 'pending' %}
+                        Complaint is awaiting review
+                      {% elif complaint.status == 'in_progress' %}
+                        Complaint is currently being processed
+                      {% else %}
+                        Complaint has been resolved
+                      {% endif %}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+           
+            <div class="form-group-premium mb-4">
+              <label class="form-label-premium">
+                <i class="fas fa-sync-alt me-2"></i>Update Status *
+              </label>
+              <div class="status-selector">
+                <div class="status-options">
+                  <label class="status-option {% if complaint.status == 'pending' %}active{% endif %}" 
+                         onclick="selectStatus('pending')">
+                    <input type="radio" name="status" value="pending" 
+                           {% if complaint.status == 'pending' %}checked{% endif %} required>
+                    <div class="option-content">
+                      <div class="option-icon">
+                        <i class="fas fa-clock"></i>
+                      </div>
+                      <div>
+                        <h6>Pending</h6>
+                        <small>Awaiting review</small>
+                      </div>
+                    </div>
+                  </label>
+                  
+                  <label class="status-option {% if complaint.status == 'in_progress' %}active{% endif %}" 
+                         onclick="selectStatus('in_progress')">
+                    <input type="radio" name="status" value="in_progress" 
+                           {% if complaint.status == 'in_progress' %}checked{% endif %}>
+                    <div class="option-content">
+                      <div class="option-icon">
+                        <i class="fas fa-spinner"></i>
+                      </div>
+                      <div>
+                        <h6>In Progress</h6>
+                        <small>Under investigation</small>
+                      </div>
+                    </div>
+                  </label>
+                  
+                  <label class="status-option {% if complaint.status == 'resolved' %}active{% endif %}" 
+                         onclick="selectStatus('resolved')">
+                    <input type="radio" name="status" value="resolved" 
+                           {% if complaint.status == 'resolved' %}checked{% endif %}>
+                    <div class="option-content">
+                      <div class="option-icon">
+                        <i class="fas fa-check-circle"></i>
+                      </div>
+                      <div>
+                        <h6>Resolved</h6>
+                        <small>Issue resolved</small>
+                      </div>
+                    </div>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+           
+            <div class="form-group-premium mb-4">
+              <label class="form-label-premium">
+                <i class="fas fa-clipboard-check me-2"></i>Resolution Details *
+                <span class="form-hint">Describe actions taken or resolution provided</span>
+              </label>
+              <div class="input-group-premium">
+                <textarea name="result" 
+                          id="resultInput" 
+                          class="form-control-premium" 
+                          rows="5"
+                          placeholder="Enter detailed resolution information..."
+                          required>{{ complaint.result or '' }}</textarea>
+                <div class="input-icon textarea-icon">
+                  <i class="fas fa-file-contract"></i>
+                </div>
+              </div>
+              <div class="invalid-feedback-premium" id="resultError">
+                <i class="fas fa-exclamation-circle me-1"></i>Please enter resolution details
+              </div>
+              <div class="char-counter">
+                <span id="resultCharCount">{{ (complaint.result or '')|length }}</span>/1000 characters
+              </div>
+            </div>
+
+          
+            <div class="templates-card mb-4">
+              <div class="templates-header" onclick="toggleTemplates()">
+                <h6><i class="fas fa-lightbulb me-2"></i>Quick Resolution Templates</h6>
+                <i class="fas fa-chevron-down" id="templateIcon"></i>
+              </div>
+              <div class="templates-body" id="templatesBody" style="display: none;">
+                <div class="template-options">
+                  <button type="button" class="template-btn" onclick="useTemplate('standard')">
+                    <i class="fas fa-cog me-2"></i>Standard Resolution
+                  </button>
+                  <button type="button" class="template-btn" onclick="useTemplate('investigation')">
+                    <i class="fas fa-search me-2"></i>Under Investigation
+                  </button>
+                  <button type="button" class="template-btn" onclick="useTemplate('action')">
+                    <i class="fas fa-tools me-2"></i>Action Taken
+                  </button>
+                  <button type="button" class="template-btn" onclick="useTemplate('resolved')">
+                    <i class="fas fa-check me-2"></i>Successfully Resolved
+                  </button>
+                </div>
+              </div>
+            </div>
+
+          
+            <div class="form-actions">
+              <button type="submit" class="btn-submit-premium">
+                <i class="fas fa-save me-2"></i>Update Complaint
+                <span class="submit-loader d-none">
+                  <i class="fas fa-spinner fa-spin"></i>
+                </span>
+              </button>
+              
+              <button type="button" class="btn-preview-premium" onclick="previewUpdate()">
+                <i class="fas fa-eye me-2"></i>Preview Update
+              </button>
+              
+              <a href="{{ url_for('admin_complaints') }}" class="btn-cancel-premium">
+                <i class="fas fa-times me-2"></i>Cancel
+              </a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal fade" id="previewModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="fas fa-eye me-2"></i>Update Preview
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="preview-content">
+          <div class="preview-section">
+            <h6>New Status:</h6>
+            <span class="status-badge" id="previewStatus">Pending</span>
+          </div>
+          <div class="preview-section">
+            <h6>Resolution Details:</h6>
+            <div class="preview-text" id="previewResult"></div>
+          </div>
+          <div class="preview-section">
+            <div class="alert alert-info">
+              <i class="fas fa-info-circle me-2"></i>
+              This is a preview. Click "Update Complaint" to save changes.
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" onclick="submitForm()">
+          <i class="fas fa-save me-2"></i>Update Now
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  :root {
+    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --success-gradient: linear-gradient(135deg, #0ba360 0%, #3cba92 100%);
+    --warning-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    --info-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    --card-hover-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+  }
+
+  body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    min-height: 100vh;
+  }
+
+
+  .dashboard-header {
+    padding-bottom: 1rem;
+  }
+
+  .dashboard-title {
+    font-size: 2.5rem;
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.5rem;
+  }
+
+  .dashboard-subtitle {
+    color: #64748b;
+    font-size: 1.1rem;
+  }
+
+  .header-border {
+    height: 4px;
+    background: var(--primary-gradient);
+    border-radius: 2px;
+    margin-top: 1rem;
+    width: 100px;
+  }
+
+  .complaint-status-indicator {
+    background: white;
+    padding: 10px 25px;
+    border-radius: 25px;
+    font-weight: 600;
+    font-size: 1rem;
+    box-shadow: var(--card-shadow);
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .status-pending {
+    color: #f093fb;
+    border: 2px solid rgba(240, 147, 251, 0.3);
+  }
+
+  .status-in_progress {
+    color: #4facfe;
+    border: 2px solid rgba(79, 172, 254, 0.3);
+  }
+
+  .status-resolved {
+    color: #0ba360;
+    border: 2px solid rgba(11, 163, 96, 0.3);
+  }
+
+
+  .complaint-summary-card {
+    background: white;
+    border-radius: 20px;
+    box-shadow: var(--card-shadow);
+    overflow: hidden;
+    height: 100%;
+  }
+
+  .summary-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 1.5rem 2rem;
+  }
+
+  .summary-header h3 {
+    margin: 0;
+    font-size: 1.4rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+  }
+
+  .complaint-id {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+
+  .summary-body {
+    padding: 2rem;
+  }
+
+  .summary-item {
+    margin-bottom: 1.5rem;
+  }
+
+  .summary-item label {
+    font-weight: 600;
+    color: #64748b;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    font-size: 0.95rem;
+  }
+
+  .summary-value {
+    color: #1e293b;
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin: 0;
+  }
+
+  .description-box {
+    background: #f8fafc;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 1.5rem;
+    color: #334155;
+    line-height: 1.6;
+    margin-top: 0.5rem;
+  }
+
+
+  .stats-sidebar {
+    background: white;
+    border-radius: 20px;
+    box-shadow: var(--card-shadow);
+    height: 100%;
+  }
+
+  .sidebar-header {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    color: white;
+    padding: 1.5rem;
+    border-radius: 20px 20px 0 0;
+  }
+
+  .sidebar-header h4 {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+  }
+
+  .sidebar-body {
+    padding: 1.5rem;
+  }
+
+  .stat-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 2px solid #f1f5f9;
+  }
+
+  .stat-item:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+  }
+
+  .stat-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin-right: 1rem;
+  }
+
+  .stat-icon.total {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.15), rgba(118, 75, 162, 0.1));
+    color: #667eea;
+  }
+
+  .stat-icon.pending {
+    background: linear-gradient(135deg, rgba(240, 147, 251, 0.15), rgba(245, 87, 108, 0.1));
+    color: #f093fb;
+  }
+
+  .stat-icon.resolved {
+    background: linear-gradient(135deg, rgba(11, 163, 96, 0.15), rgba(60, 186, 146, 0.1));
+    color: #0ba360;
+  }
+
+  .stat-item h5 {
+    font-size: 0.95rem;
+    color: #64748b;
+    margin-bottom: 0.3rem;
+  }
+
+  .stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0;
+  }
+
+
+  .premium-form-card {
+    background: white;
+    border-radius: 25px;
+    box-shadow: var(--card-shadow);
+    overflow: hidden;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+  }
+
+  .form-card-header {
+    background: linear-gradient(135deg, #0ba360 0%, #3cba92 100%);
+    color: white;
+    padding: 2rem;
+  }
+
+  .form-icon {
+    width: 60px;
+    height: 60px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    margin-right: 1.5rem;
+  }
+
+  .form-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+
+  .form-subtitle {
+    opacity: 0.9;
+    font-size: 1rem;
+  }
+
+  .form-card-body {
+    padding: 2rem;
+  }
+
+ 
+  .current-status-display {
+    border: 2px solid;
+    border-radius: 15px;
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .status-pending {
+    border-color: rgba(240, 147, 251, 0.3);
+    background: linear-gradient(90deg, rgba(240, 147, 251, 0.05), transparent);
+  }
+
+  .status-in_progress {
+    border-color: rgba(79, 172, 254, 0.3);
+    background: linear-gradient(90deg, rgba(79, 172, 254, 0.05), transparent);
+  }
+
+  .status-resolved {
+    border-color: rgba(11, 163, 96, 0.3);
+    background: linear-gradient(90deg, rgba(11, 163, 96, 0.05), transparent);
+  }
+
+  .status-content {
+    display: flex;
+    align-items: center;
+  }
+
+  .status-content i {
+    font-size: 2rem;
+  }
+
+  .status-content h5 {
+    font-size: 1.3rem;
+    margin: 0;
+  }
+
+  .status-content p {
+    font-size: 0.95rem;
+    margin: 0;
+  }
+
+  .status-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+  }
+
+  .status-option {
+    border: 2px solid #e2e8f0;
+    border-radius: 15px;
+    padding: 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+  }
+
+  .status-option:hover {
+    border-color: #cbd5e1;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+  }
+
+  .status-option.active {
+    border-color: #667eea;
+    background: rgba(102, 126, 234, 0.05);
+  }
+
+  .status-option input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .option-content {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .option-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+  }
+
+  .status-option:nth-child(1) .option-icon {
+    background: linear-gradient(135deg, rgba(240, 147, 251, 0.15), rgba(245, 87, 108, 0.1));
+    color: #f093fb;
+  }
+
+  .status-option:nth-child(2) .option-icon {
+    background: linear-gradient(135deg, rgba(79, 172, 254, 0.15), rgba(0, 242, 254, 0.1));
+    color: #4facfe;
+  }
+
+  .status-option:nth-child(3) .option-icon {
+    background: linear-gradient(135deg, rgba(11, 163, 96, 0.15), rgba(60, 186, 146, 0.1));
+    color: #0ba360;
+  }
+
+  .option-content h6 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0 0 0.3rem 0;
+    color: #1e293b;
+  }
+
+  .option-content small {
+    color: #64748b;
+    font-size: 0.85rem;
+  }
+
+
+  .form-group-premium {
+    position: relative;
+  }
+
+  .form-label-premium {
+    display: block;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 0.8rem;
+    font-size: 1.1rem;
+  }
+
+  .form-hint {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 400;
+    color: #64748b;
+    margin-top: 0.3rem;
+  }
+
+  .input-group-premium {
+    position: relative;
+  }
+
+  .form-control-premium {
+    width: 100%;
+    padding: 1rem 1rem 1rem 3rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-family: 'Poppins', sans-serif;
+    transition: all 0.3s ease;
+    background: #f8fafc;
+  }
+
+  .form-control-premium:focus {
+    outline: none;
+    border-color: #667eea;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  }
+
+  .input-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+    font-size: 1.1rem;
+  }
+
+  .textarea-icon {
+    top: 1.5rem;
+    transform: none;
+  }
+
+  .invalid-feedback-premium {
+    display: none;
+    color: #f5576c;
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+    align-items: center;
+  }
+
+  .char-counter {
+    text-align: right;
+    font-size: 0.85rem;
+    color: #94a3b8;
+    margin-top: 0.5rem;
+  }
+
+  /* Templates Card */
+  .templates-card {
+    background: linear-gradient(135deg, rgba(255, 243, 205, 0.3), rgba(255, 243, 205, 0.1));
+    border: 2px solid #ffeaa7;
+    border-radius: 15px;
+    overflow: hidden;
+  }
+
+  .templates-header {
+    padding: 1.2rem 1.5rem;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background 0.3s ease;
+  }
+
+  .templates-header:hover {
+    background: rgba(255, 234, 167, 0.2);
+  }
+
+  .templates-header h6 {
+    margin: 0;
+    color: #e17055;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+  }
+
+  .templates-body {
+    padding: 0 1.5rem 1.5rem;
+  }
+
+  .template-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+
+  .template-btn {
+    background: white;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 1rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .template-btn:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  }
+
+  /* Form Actions */
+  .form-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    padding-top: 2rem;
+    border-top: 2px solid #f1f5f9;
+    flex-wrap: wrap;
+  }
+
+  .btn-submit-premium {
+    background: var(--success-gradient);
+    color: white;
+    border: none;
+    padding: 1rem 2.5rem;
+    border-radius: 25px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 200px;
+    box-shadow: 0 5px 20px rgba(11, 163, 96, 0.3);
+  }
+
+  .btn-submit-premium:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(11, 163, 96, 0.4);
+  }
+
+  .btn-submit-premium:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+
+  .btn-preview-premium {
+    background: var(--info-gradient);
+    color: white;
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 25px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .btn-preview-premium:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(79, 172, 254, 0.3);
+  }
+
+  .btn-cancel-premium {
+    background: white;
+    color: #64748b;
+    border: 2px solid #e2e8f0;
+    padding: 1rem 2rem;
+    border-radius: 25px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+  }
+
+  .btn-cancel-premium:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+  }
+
+  .submit-loader {
+    margin-left: 0.5rem;
+  }
+
+  /* Preview Modal */
+  .modal-content {
+    border-radius: 20px;
+    border: none;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+  }
+
+  .modal-header {
+    background: var(--primary-gradient);
+    color: white;
+    border-radius: 20px 20px 0 0;
+    padding: 1.5rem 2rem;
+  }
+
+  .preview-content {
+    padding: 1rem;
+  }
+
+  .preview-section {
+    margin-bottom: 1.5rem;
+  }
+
+  .preview-section h6 {
+    color: #667eea;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+
+  .preview-text {
+    background: #f8fafc;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 1rem;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+
+  .status-badge {
+    padding: 6px 15px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    display: inline-block;
+  }
+
+  .status-badge[data-status="pending"] {
+    background: linear-gradient(135deg, rgba(240, 147, 251, 0.15), rgba(245, 87, 108, 0.1));
+    color: #f093fb;
+    border: 1px solid rgba(240, 147, 251, 0.3);
+  }
+
+  .status-badge[data-status="in_progress"] {
+    background: linear-gradient(135deg, rgba(79, 172, 254, 0.15), rgba(0, 242, 254, 0.1));
+    color: #4facfe;
+    border: 1px solid rgba(79, 172, 254, 0.3);
+  }
+
+  .status-badge[data-status="resolved"] {
+    background: linear-gradient(135deg, rgba(11, 163, 96, 0.15), rgba(60, 186, 146, 0.1));
+    color: #0ba360;
+    border: 1px solid rgba(11, 163, 96, 0.3);
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .dashboard-title {
+      font-size: 2rem;
+    }
+    
+    .status-options {
+      grid-template-columns: 1fr;
+    }
+    
+    .form-actions {
+      flex-direction: column;
+    }
+    
+    .btn-submit-premium,
+    .btn-preview-premium,
+    .btn-cancel-premium {
+      width: 100%;
+      justify-content: center;
+    }
+    
+    .template-options {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Character counter for result textarea
+  const resultInput = document.getElementById('resultInput');
+  const resultCounter = document.getElementById('resultCharCount');
+  
+  if (resultInput) {
+    resultInput.addEventListener('input', function() {
+      resultCounter.textContent = this.value.length;
+      if (this.value.length > 1000) {
+        this.value = this.value.substring(0, 1000);
+        resultCounter.textContent = 1000;
+      }
+    });
+    
+    // Initialize counter
+    resultCounter.textContent = resultInput.value.length;
+  }
+  
+  // Status selection
+  window.selectStatus = function(status) {
+    const options = document.querySelectorAll('.status-option');
+    options.forEach(option => option.classList.remove('active'));
+    
+    const selectedOption = document.querySelector(`.status-option input[value="${status}"]`);
+    if (selectedOption) {
+      selectedOption.checked = true;
+      selectedOption.closest('.status-option').classList.add('active');
+    }
+  };
+  
+  // Template management
+  window.toggleTemplates = function() {
+    const body = document.getElementById('templatesBody');
+    const icon = document.getElementById('templateIcon');
+    
+    if (body.style.display === 'none') {
+      body.style.display = 'block';
+      icon.className = 'fas fa-chevron-up';
+    } else {
+      body.style.display = 'none';
+      icon.className = 'fas fa-chevron-down';
+    }
+  };
+  
+  window.useTemplate = function(templateType) {
+    const templates = {
+      standard: "The complaint has been reviewed and appropriate action has been taken. The issue has been addressed and resolved according to standard procedures.",
+      investigation: "This complaint is currently under investigation by our team. We are gathering information and assessing the situation. An update will be provided within 48 hours.",
+      action: "Based on our investigation, the following actions have been taken: 1) The responsible department has been notified, 2) Corrective measures have been implemented, 3) Monitoring has been established to prevent recurrence.",
+      resolved: "We are pleased to inform you that your complaint has been successfully resolved. All necessary actions have been completed and the issue has been fully addressed. Thank you for bringing this to our attention."
+    };
+    
+    if (resultInput && templates[templateType]) {
+      resultInput.value = templates[templateType];
+      resultCounter.textContent = resultInput.value.length;
+      
+      // Show success message
+      showToast('Template applied successfully!');
+    }
+  };
+  
+  // Preview functionality
+  window.previewUpdate = function() {
+    const form = document.getElementById('editComplaintForm');
+    const status = form.querySelector('input[name="status"]:checked');
+    const result = document.getElementById('resultInput').value;
+    
+    if (!status || !result.trim()) {
+      alert('Please select a status and enter resolution details before previewing.');
+      return;
+    }
+    
+    // Update preview modal
+    document.getElementById('previewStatus').textContent = status.value.replace('_', ' ').toUpperCase();
+    document.getElementById('previewStatus').dataset.status = status.value;
+    document.getElementById('previewResult').textContent = result;
+    
+    // Show modal
+    const previewModal = new bootstrap.Modal(document.getElementById('previewModal'));
+    previewModal.show();
+  };
+  
+  window.submitForm = function() {
+    document.getElementById('editComplaintForm').submit();
+  };
+  
+  // Form submission
+  const form = document.getElementById('editComplaintForm');
+  const submitBtn = form.querySelector('.btn-submit-premium');
+  const submitLoader = submitBtn.querySelector('.submit-loader');
+  
+  form.addEventListener('submit', function(e) {
+    const status = this.querySelector('input[name="status"]:checked');
+    const result = document.getElementById('resultInput').value.trim();
+    
+    if (!status) {
+      e.preventDefault();
+      alert('Please select a status for the complaint.');
+      return;
+    }
+    
+    if (!result) {
+      e.preventDefault();
+      alert('Please enter resolution details.');
+      return;
+    }
+    
+    // Show loading
+    submitBtn.disabled = true;
+    submitLoader.classList.remove('d-none');
+    submitBtn.innerHTML = '<i class="fas fa-save me-2"></i>Updating...';
+  });
+  
+  // Toast notification function
+  function showToast(message) {
+    const toast = document.createElement('div');
+    toast.className = 'toast-notification';
+    toast.innerHTML = `
+      <div class="toast-content">
+        <i class="fas fa-check-circle me-2"></i>
+        ${message}
+      </div>
+    `;
+    
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+      toast.classList.add('show');
+    }, 100);
+    
+    setTimeout(() => {
+      toast.classList.remove('show');
+      setTimeout(() => {
+        document.body.removeChild(toast);
+      }, 300);
+    }, 3000);
+  }
+  
+  // Add toast styles
+  const style = document.createElement('style');
+  style.textContent = `
+    .toast-notification {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: linear-gradient(135deg, #0ba360 0%, #3cba92 100%);
+      color: white;
+      padding: 15px 25px;
+      border-radius: 10px;
+      box-shadow: 0 10px 25px rgba(11, 163, 96, 0.3);
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s ease;
+      z-index: 9999;
+      max-width: 300px;
+    }
+    
+    .toast-notification.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    
+    .toast-content {
+      display: flex;
+      align-items: center;
+      font-weight: 500;
+    }
+  `;
+  document.head.appendChild(style);
+});
+</script>
+
+{% endblock %}

@@ -1,0 +1,34 @@
+
+.table-glass {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    color: white;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+
+.table-header th {
+    background-color: #28a745;
+    color: white;
+    font-weight: bold;
+    text-align: center;
+}
+
+
+.table-glass tbody tr:hover {
+    background-color: greenyellow !important;
+   
+}
+
+
+.table-glass td,
+.table-glass th {
+    text-align: center;
+    vertical-align: middle;
+}
+
+
+.table-glass {
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+}

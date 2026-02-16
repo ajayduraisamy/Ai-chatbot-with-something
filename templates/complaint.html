@@ -1,0 +1,919 @@
+{% extends "base.html" %}
+{% block content %}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<div class="container py-5">
+
+  <!-- Header Section -->
+  <div class="dashboard-header mb-5">
+    <div class="d-flex justify-content-between align-items-center">
+      <div>
+        <h1 class="dashboard-title fw-bold">Report New Complaint</h1>
+        <p class="dashboard-subtitle">Submit your issue with detailed information and images</p>
+      </div>
+      <div>
+        <span class="step-indicator">
+          <span class="step-number">1</span> of <span class="step-total">3</span> Steps
+        </span>
+      </div>
+    </div>
+    <div class="header-border"></div>
+  </div>
+
+  <!-- Progress Steps -->
+  <div class="row mb-5">
+    <div class="col-12">
+      <div class="progress-steps">
+        <div class="step active">
+          <div class="step-circle">
+            <span>1</span>
+          </div>
+          <div class="step-label">Complaint Details</div>
+        </div>
+       
+      </div>
+    </div>
+  </div>
+
+  <!-- Flash Messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show alert-premium" role="alert">
+          <div class="d-flex align-items-center">
+            <i class="fas 
+              {% if category == 'success' %}fa-check-circle
+              {% elif category == 'danger' %}fa-exclamation-circle
+              {% elif category == 'warning' %}fa-exclamation-triangle
+              {% else %}fa-info-circle{% endif %}
+              me-3 fs-4"></i>
+            <div>{{ message }}</div>
+          </div>
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  <!-- Complaint Form -->
+  <div class="row justify-content-center">
+    <div class="col-lg-10 col-xl-8">
+      <div class="premium-form-card">
+        <div class="form-card-header">
+          <div class="d-flex align-items-center">
+            <div class="form-icon">
+              <i class="fas fa-exclamation-circle"></i>
+            </div>
+            <div>
+              <h3 class="form-title">Complaint Information</h3>
+              <p class="form-subtitle">Please provide all necessary details about your issue</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-card-body">
+          <form method="POST" enctype="multipart/form-data" class="needs-validation" novalidate id="complaintForm">
+
+            <!-- Title Field -->
+            <div class="form-group-premium mb-4">
+              <label class="form-label-premium">
+                <i class="fas fa-heading me-2"></i>Complaint Title *
+                <span class="form-hint">Be specific and concise</span>
+              </label>
+              <div class="input-group-premium">
+                <input type="text" 
+                       name="title" 
+                       class="form-control-premium" 
+                       placeholder="e.g., Damaged road near Central Park" 
+                       required
+                       maxlength="100">
+                <div class="input-icon">
+                  <i class="fas fa-pen"></i>
+                </div>
+              </div>
+              <div class="invalid-feedback-premium">
+                <i class="fas fa-exclamation-circle me-1"></i>Please enter a complaint title
+              </div>
+              <div class="char-counter">
+                <span id="titleCharCount">0</span>/100 characters
+              </div>
+            </div>
+
+            <!-- Description Field -->
+            <div class="form-group-premium mb-4">
+              <label class="form-label-premium">
+                <i class="fas fa-align-left me-2"></i>Detailed Description *
+                <span class="form-hint">Describe the issue in detail including location, severity, etc.</span>
+              </label>
+              <div class="input-group-premium">
+                <textarea name="description" 
+                          rows="5" 
+                          class="form-control-premium" 
+                          placeholder="Provide detailed information about the complaint..."
+                          required
+                          maxlength="500"></textarea>
+                <div class="input-icon textarea-icon">
+                  <i class="fas fa-file-alt"></i>
+                </div>
+              </div>
+              <div class="invalid-feedback-premium">
+                <i class="fas fa-exclamation-circle me-1"></i>Please enter a detailed description
+              </div>
+              <div class="char-counter">
+                <span id="descCharCount">0</span>/500 characters
+              </div>
+            </div>
+
+            <!-- Image Upload Field -->
+            <div class="form-group-premium mb-4">
+              <label class="form-label-premium">
+                <i class="fas fa-camera me-2"></i>Upload Image Evidence *
+                <span class="form-hint">Upload clear photos that support your complaint (Max: 5MB, JPG/PNG)</span>
+              </label>
+              
+              <!-- Upload Box -->
+              <div class="upload-area" id="uploadArea">
+                <div class="upload-content" id="uploadContent">
+                  <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                  <h4 class="upload-title">Drag & Drop or Click to Upload</h4>
+                  <p class="upload-subtitle">Support: JPG, PNG, GIF (Max 5MB)</p>
+                  <button type="button" class="btn-upload" onclick="document.getElementById('imageInput').click()">
+                    <i class="fas fa-search me-2"></i>Browse Files
+                  </button>
+                </div>
+                
+                <!-- Preview Container -->
+                <div class="preview-container" id="previewContainer" style="display: none;">
+                  <div class="image-preview">
+                    <img id="imagePreview" class="preview-image">
+                    <button type="button" class="btn-remove-preview" onclick="removeImage()">
+                      <i class="fas fa-times"></i>
+                    </button>
+                  </div>
+                  <div class="preview-info">
+                    <h6 id="fileName">No file selected</h6>
+                    <div class="file-size" id="fileSize">0 MB</div>
+                  </div>
+                </div>
+                
+                <!-- Hidden File Input -->
+                <input type="file" 
+                       name="complaint_image" 
+                       id="imageInput" 
+                       class="d-none" 
+                       accept="image/*" 
+                       required>
+              </div>
+              
+              <div class="invalid-feedback-premium" id="imageError">
+                <i class="fas fa-exclamation-circle me-1"></i>Please upload an image
+              </div>
+            </div>
+
+            <!-- Tips Section -->
+            <div class="tips-card">
+              <div class="tips-header">
+                <i class="fas fa-lightbulb me-2"></i>Tips for Better Complaint Submission
+              </div>
+              <div class="tips-body">
+                <ul class="tips-list">
+                  <li>
+                    <i class="fas fa-check-circle text-success me-2"></i>
+                    Take clear, well-lit photos from multiple angles
+                  </li>
+                  <li>
+                    <i class="fas fa-check-circle text-success me-2"></i>
+                    Include specific location details in description
+                  </li>
+                  <li>
+                    <i class="fas fa-check-circle text-success me-2"></i>
+                    Mention how long the issue has been present
+                  </li>
+                  <li>
+                    <i class="fas fa-check-circle text-success me-2"></i>
+                    Be clear about the impact on daily life
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="form-actions">
+              <button type="submit" class="btn-submit-premium">
+                <i class="fas fa-paper-plane me-2"></i>Submit Complaint
+                <span class="submit-loader d-none">
+                  <i class="fas fa-spinner fa-spin"></i>
+                </span>
+              </button>
+              <a href="{{ url_for('index') }}" class="btn-cancel-premium">
+                <i class="fas fa-times me-2"></i>Cancel
+              </a>
+            </div>
+
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<style>
+  :root {
+    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    --success-gradient: linear-gradient(135deg, #0ba360 0%, #3cba92 100%);
+    --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    --card-hover-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+    --input-focus-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  }
+
+  body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Header Styles */
+  .dashboard-header {
+    padding-bottom: 1rem;
+  }
+
+  .dashboard-title {
+    font-size: 2.5rem;
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.5rem;
+  }
+
+  .dashboard-subtitle {
+    color: #64748b;
+    font-size: 1.1rem;
+  }
+
+  .header-border {
+    height: 4px;
+    background: var(--primary-gradient);
+    border-radius: 2px;
+    margin-top: 1rem;
+    width: 100px;
+  }
+
+  .step-indicator {
+    background: white;
+    padding: 10px 20px;
+    border-radius: 25px;
+    font-weight: 600;
+    color: #667eea;
+    box-shadow: var(--card-shadow);
+  }
+
+  .step-number {
+    background: var(--primary-gradient);
+    color: white;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 5px;
+  }
+
+  /* Progress Steps */
+  .progress-steps {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .progress-steps::before {
+    content: '';
+    position: absolute;
+    top: 25px;
+    left: 10%;
+    right: 10%;
+    height: 4px;
+    background: #e2e8f0;
+    z-index: 1;
+  }
+
+  .step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    z-index: 2;
+    flex: 1;
+  }
+
+  .step-circle {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.2rem;
+    color: #94a3b8;
+    margin-bottom: 10px;
+    transition: all 0.3s ease;
+    border: 4px solid white;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+
+  .step.active .step-circle {
+    background: var(--primary-gradient);
+    color: white;
+    transform: scale(1.1);
+  }
+
+  .step-label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #64748b;
+    text-align: center;
+  }
+
+  .step.active .step-label {
+    color: #667eea;
+    font-weight: 600;
+  }
+
+  /* Form Card */
+  .premium-form-card {
+    background: white;
+    border-radius: 25px;
+    box-shadow: var(--card-shadow);
+    overflow: hidden;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+  }
+
+  .form-card-header {
+    background: var(--primary-gradient);
+    color: white;
+    padding: 2rem;
+  }
+
+  .form-icon {
+    width: 60px;
+    height: 60px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    margin-right: 1.5rem;
+  }
+
+  .form-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+
+  .form-subtitle {
+    opacity: 0.9;
+    font-size: 1rem;
+  }
+
+  .form-card-body {
+    padding: 2rem;
+  }
+
+  /* Form Elements */
+  .form-group-premium {
+    position: relative;
+  }
+
+  .form-label-premium {
+    display: block;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 0.8rem;
+    font-size: 1.1rem;
+  }
+
+  .form-hint {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 400;
+    color: #64748b;
+    margin-top: 0.3rem;
+  }
+
+  .input-group-premium {
+    position: relative;
+  }
+
+  .form-control-premium {
+    width: 100%;
+    padding: 1rem 1rem 1rem 3rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-family: 'Poppins', sans-serif;
+    transition: all 0.3s ease;
+    background: #f8fafc;
+  }
+
+  .form-control-premium:focus {
+    outline: none;
+    border-color: #667eea;
+    background: white;
+    box-shadow: var(--input-focus-shadow);
+  }
+
+  .form-control-premium.is-invalid {
+    border-color: #f5576c;
+    background: linear-gradient(90deg, rgba(245, 87, 108, 0.05), transparent);
+  }
+
+  .form-control-premium.is-valid {
+    border-color: #0ba360;
+  }
+
+  .input-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+    font-size: 1.1rem;
+  }
+
+  .textarea-icon {
+    top: 1.5rem;
+    transform: none;
+  }
+
+  .invalid-feedback-premium {
+    display: none;
+    color: #f5576c;
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+    align-items: center;
+  }
+
+  .was-validated .form-control-premium:invalid ~ .invalid-feedback-premium {
+    display: flex;
+  }
+
+  .char-counter {
+    text-align: right;
+    font-size: 0.85rem;
+    color: #94a3b8;
+    margin-top: 0.5rem;
+  }
+
+  /* Upload Area */
+  .upload-area {
+    border: 3px dashed #cbd5e1;
+    border-radius: 15px;
+    padding: 2rem;
+    text-align: center;
+    background: #f8fafc;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .upload-area:hover {
+    border-color: #667eea;
+    background: rgba(102, 126, 234, 0.02);
+  }
+
+  .upload-area.dragover {
+    border-color: #667eea;
+    background: rgba(102, 126, 234, 0.05);
+  }
+
+  .upload-content {
+    transition: opacity 0.3s ease;
+  }
+
+  .upload-icon {
+    font-size: 3rem;
+    color: #94a3b8;
+    margin-bottom: 1rem;
+  }
+
+  .upload-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 0.5rem;
+  }
+
+  .upload-subtitle {
+    color: #64748b;
+    margin-bottom: 1.5rem;
+  }
+
+  .btn-upload {
+    background: var(--primary-gradient);
+    color: white;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 25px;
+    font-weight: 500;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .btn-upload:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+  }
+
+  /* Preview Container */
+  .preview-container {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 2px solid #e2e8f0;
+    width: 100%;
+    animation: slideIn 0.3s ease;
+  }
+
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .image-preview {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    flex-shrink: 0;
+  }
+
+  .preview-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 10px;
+    border: 3px solid #e2e8f0;
+  }
+
+  .btn-remove-preview {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    width: 30px;
+    height: 30px;
+    background: var(--secondary-gradient);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: all 0.3s ease;
+  }
+
+  .btn-remove-preview:hover {
+    transform: scale(1.1);
+  }
+
+  .preview-info {
+    flex-grow: 1;
+    text-align: left;
+  }
+
+  .preview-info h6 {
+    margin: 0 0 0.5rem 0;
+    color: #1e293b;
+    font-size: 1.1rem;
+  }
+
+  .file-size {
+    color: #64748b;
+    font-size: 0.9rem;
+    background: #f1f5f9;
+    padding: 3px 10px;
+    border-radius: 15px;
+    display: inline-block;
+  }
+
+  /* Tips Card */
+  .tips-card {
+    background: linear-gradient(135deg, rgba(255, 243, 205, 0.3), rgba(255, 243, 205, 0.1));
+    border-radius: 15px;
+    border: 2px solid #ffeaa7;
+    padding: 1.5rem;
+    margin: 2rem 0;
+  }
+
+  .tips-header {
+    color: #e17055;
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+  }
+
+  .tips-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .tips-list li {
+    padding: 0.5rem 0;
+    color: #2d3436;
+    display: flex;
+    align-items: flex-start;
+  }
+
+  /* Form Actions */
+  .form-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    padding-top: 2rem;
+    border-top: 2px solid #f1f5f9;
+  }
+
+  .btn-submit-premium {
+    background: var(--success-gradient);
+    color: white;
+    border: none;
+    padding: 1rem 2.5rem;
+    border-radius: 25px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 200px;
+    box-shadow: 0 5px 20px rgba(11, 163, 96, 0.3);
+  }
+
+  .btn-submit-premium:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(11, 163, 96, 0.4);
+  }
+
+  .btn-submit-premium:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+
+  .btn-cancel-premium {
+    background: white;
+    color: #64748b;
+    border: 2px solid #e2e8f0;
+    padding: 1rem 2rem;
+    border-radius: 25px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+  }
+
+  .btn-cancel-premium:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+  }
+
+  .submit-loader {
+    margin-left: 0.5rem;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .dashboard-title {
+      font-size: 2rem;
+    }
+    
+    .progress-steps {
+      flex-direction: column;
+      gap: 2rem;
+    }
+    
+    .progress-steps::before {
+      display: none;
+    }
+    
+    .form-actions {
+      flex-direction: column;
+    }
+    
+    .btn-submit-premium,
+    .btn-cancel-premium {
+      width: 100%;
+      justify-content: center;
+    }
+    
+    .preview-container {
+      flex-direction: column;
+      text-align: center;
+    }
+  }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Character counters
+  const titleInput = document.querySelector('input[name="title"]');
+  const descTextarea = document.querySelector('textarea[name="description"]');
+  const titleCounter = document.getElementById('titleCharCount');
+  const descCounter = document.getElementById('descCharCount');
+  
+  if (titleInput) {
+    titleInput.addEventListener('input', function() {
+      titleCounter.textContent = this.value.length;
+    });
+  }
+  
+  if (descTextarea) {
+    descTextarea.addEventListener('input', function() {
+      descCounter.textContent = this.value.length;
+    });
+  }
+  
+  // Image upload handling
+  const uploadArea = document.getElementById('uploadArea');
+  const uploadContent = document.getElementById('uploadContent');
+  const previewContainer = document.getElementById('previewContainer');
+  const imageInput = document.getElementById('imageInput');
+  const imagePreview = document.getElementById('imagePreview');
+  const fileName = document.getElementById('fileName');
+  const fileSize = document.getElementById('fileSize');
+  const imageError = document.getElementById('imageError');
+  
+  // Drag and drop
+  ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+    uploadArea.addEventListener(eventName, preventDefaults, false);
+  });
+  
+  function preventDefaults(e) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+  
+  ['dragenter', 'dragover'].forEach(eventName => {
+    uploadArea.addEventListener(eventName, highlight, false);
+  });
+  
+  ['dragleave', 'drop'].forEach(eventName => {
+    uploadArea.addEventListener(eventName, unhighlight, false);
+  });
+  
+  function highlight() {
+    uploadArea.classList.add('dragover');
+  }
+  
+  function unhighlight() {
+    uploadArea.classList.remove('dragover');
+  }
+  
+  uploadArea.addEventListener('drop', handleDrop, false);
+  
+  function handleDrop(e) {
+    const dt = e.dataTransfer;
+    const files = dt.files;
+    handleFiles(files);
+  }
+  
+  imageInput.addEventListener('change', function() {
+    handleFiles(this.files);
+  });
+  
+  function handleFiles(files) {
+    if (files.length > 0) {
+      const file = files[0];
+      
+      // Validate file type
+      if (!file.type.match('image.*')) {
+        showImageError('Please upload an image file (JPG, PNG, GIF)');
+        return;
+      }
+      
+      // Validate file size (5MB max)
+      if (file.size > 5 * 1024 * 1024) {
+        showImageError('File size must be less than 5MB');
+        return;
+      }
+      
+      // Hide error
+      hideImageError();
+      
+      // Display preview
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        imagePreview.src = e.target.result;
+        uploadContent.style.display = 'none';
+        previewContainer.style.display = 'flex';
+        
+        // Update file info
+        fileName.textContent = file.name;
+        const sizeInMB = (file.size / (1024 * 1024)).toFixed(2);
+        fileSize.textContent = sizeInMB + ' MB';
+      };
+      reader.readAsDataURL(file);
+      
+      // Remove required attribute to prevent form validation error
+      imageInput.removeAttribute('required');
+    }
+  }
+  
+  function showImageError(message) {
+    imageError.innerHTML = `<i class="fas fa-exclamation-circle me-1"></i>${message}`;
+    imageError.style.display = 'flex';
+  }
+  
+  function hideImageError() {
+    imageError.style.display = 'none';
+  }
+  
+  // Image removal
+  window.removeImage = function() {
+    imagePreview.src = '';
+    uploadContent.style.display = 'block';
+    previewContainer.style.display = 'none';
+    imageInput.value = '';
+    imageInput.setAttribute('required', 'required');
+  };
+  
+  // Form submission
+  const form = document.getElementById('complaintForm');
+  const submitBtn = form.querySelector('.btn-submit-premium');
+  const submitLoader = submitBtn.querySelector('.submit-loader');
+  
+  form.addEventListener('submit', function(e) {
+    // Validate form
+    if (!form.checkValidity()) {
+      e.preventDefault();
+      e.stopPropagation();
+    } else {
+      // Show loading
+      submitBtn.disabled = true;
+      submitLoader.classList.remove('d-none');
+      submitBtn.innerHTML = '<i class="fas fa-paper-plane me-2"></i>Submitting...';
+    }
+    form.classList.add('was-validated');
+  });
+  
+  // Real-time validation
+  const formControls = form.querySelectorAll('.form-control-premium');
+  formControls.forEach(control => {
+    control.addEventListener('input', function() {
+      if (this.checkValidity()) {
+        this.classList.remove('is-invalid');
+        this.classList.add('is-valid');
+      } else {
+        this.classList.remove('is-valid');
+        this.classList.add('is-invalid');
+      }
+    });
+  });
+  
+  // Initialize character counters
+  if (titleInput.value) {
+    titleCounter.textContent = titleInput.value.length;
+  }
+  if (descTextarea.value) {
+    descCounter.textContent = descTextarea.value.length;
+  }
+});
+</script>
+
+{% endblock %}

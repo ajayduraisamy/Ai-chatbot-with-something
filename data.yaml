@@ -1,0 +1,16 @@
+# Dataset paths
+train: dataset/train/img
+val: dataset/val/img
+
+# Number of classes
+nc: 7
+
+# Class names
+names:
+  0: broken streetlight
+  1: damaged footpath sidewalk
+  2: flood
+  3: garbage
+  4: open manhole
+  5: sewageleak
+  6: waterleakage

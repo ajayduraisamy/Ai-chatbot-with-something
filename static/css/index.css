@@ -1,0 +1,12 @@
+.hero {
+    width: 100%;
+    min-height: 130vh;
+    background: url('/static/images/home.png') no-repeat center center;
+    background-size: cover;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: white;
+    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+}

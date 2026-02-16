@@ -1,0 +1,1170 @@
+{% extends "base.html" %}
+{% block content %}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<div class="container-fluid py-4">
+
+  <!-- Header Section -->
+  <div class="dashboard-header mb-4">
+    <div class="d-flex justify-content-between align-items-center">
+      <div>
+        <h1 class="dashboard-title fw-bold">Complaints Management</h1>
+        <p class="dashboard-subtitle">Monitor and manage all user complaints</p>
+      </div>
+      <div class="d-flex gap-3 align-items-center">
+        <div class="admin-controls">
+          <span class="admin-badge">
+            <i class="fas fa-shield-alt me-2"></i>Admin Dashboard
+          </span>
+        </div>
+        <button class="btn-refresh" onclick="refreshData()">
+          <i class="fas fa-sync-alt"></i>
+        </button>
+      </div>
+    </div>
+    <div class="header-border"></div>
+  </div>
+
+  <!-- Stats Overview -->
+  <div class="row mb-5 g-4">
+    <div class="col-md-3">
+      <div class="stat-card-admin total animate-on-hover">
+        <div class="d-flex align-items-center justify-content-between">
+          <div>
+            <h3 class="mb-1">{{ complaints|length }}</h3>
+            <p class="text-muted mb-0">Total Complaints</p>
+          </div>
+          <div class="stat-icon-admin">
+            <i class="fas fa-file-alt"></i>
+          </div>
+        </div>
+        
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <div class="stat-card-admin pending animate-on-hover">
+        <div class="d-flex align-items-center justify-content-between">
+          <div>
+            <h3 class="mb-1">{{ complaints|selectattr('status', 'equalto', 'pending')|list|length }}</h3>
+            <p class="text-muted mb-0">Pending</p>
+          </div>
+          <div class="stat-icon-admin">
+            <i class="fas fa-clock"></i>
+          </div>
+        </div>
+      
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <div class="stat-card-admin progress animate-on-hover">
+        <div class="d-flex align-items-center justify-content-between">
+          <div>
+            <h3 class="mb-1">{{ complaints|selectattr('status', 'equalto', 'in_progress')|list|length }}</h3>
+            <p class="text-muted mb-0">In Progress</p>
+          </div>
+          <div class="stat-icon-admin">
+            <i class="fas fa-spinner"></i>
+          </div>
+        </div>
+     
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <div class="stat-card-admin resolved animate-on-hover">
+        <div class="d-flex align-items-center justify-content-between">
+          <div>
+            <h3 class="mb-1">{{ complaints|selectattr('status', 'equalto', 'resolved')|list|length }}</h3>
+            <p class="text-muted mb-0">Resolved</p>
+          </div>
+          <div class="stat-icon-admin">
+            <i class="fas fa-check-circle"></i>
+          </div>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter Controls -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="filter-card">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+          <div>
+            <h5 class="mb-0"><i class="fas fa-filter me-2"></i>Filters & Actions</h5>
+          </div>
+          <div class="d-flex gap-3 flex-wrap">
+            <div class="filter-group">
+              <select class="form-select filter-select" id="statusFilter">
+                <option value="all">All Status</option>
+                <option value="pending">Pending</option>
+                <option value="in_progress">In Progress</option>
+                <option value="resolved">Resolved</option>
+              </select>
+            </div>
+            <div class="filter-group">
+              <input type="text" class="form-control filter-input" placeholder="Search complaints..." id="searchInput">
+            </div>
+            <button class="btn-filter-apply" onclick="applyFilters()">
+              <i class="fas fa-search me-2"></i>Apply
+            </button>
+            <button class="btn-filter-reset" onclick="resetFilters()">
+              <i class="fas fa-redo me-2"></i>Reset
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Complaints Table -->
+  <div class="premium-table-card">
+    <div class="table-responsive">
+      <table class="table premium-table" id="complaintsTable">
+        <thead>
+          <tr>
+            <th class="table-head">
+              <div class="d-flex align-items-center">
+                <span>#</span>
+                <button class="sort-btn" data-sort="id">
+                  <i class="fas fa-sort"></i>
+                </button>
+              </div>
+            </th>
+            <th class="table-head">
+              <div class="d-flex align-items-center">
+                <span>Title</span>
+                <button class="sort-btn" data-sort="title">
+                  <i class="fas fa-sort"></i>
+                </button>
+              </div>
+            </th>
+            <th class="table-head">
+              <div class="d-flex align-items-center">
+                <span>User</span>
+                <button class="sort-btn" data-sort="user">
+                  <i class="fas fa-sort"></i>
+                </button>
+              </div>
+            </th>
+            <th class="table-head">
+              <div class="d-flex align-items-center">
+                <span>Status</span>
+                <button class="sort-btn" data-sort="status">
+                  <i class="fas fa-sort"></i>
+                </button>
+              </div>
+            </th>
+            <th class="table-head">
+              <div class="d-flex align-items-center">
+                <span>Date</span>
+                <button class="sort-btn" data-sort="date">
+                  <i class="fas fa-sort"></i>
+                </button>
+              </div>
+            </th>
+            <th class="table-head">
+              <div class="d-flex align-items-center">
+                <span>Actions</span>
+              </div>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for c in complaints %}
+          <tr class="table-row animate-on-hover" data-status="{{ c.status }}">
+            <td class="table-cell">
+              <span class="complaint-id">{{ loop.index }}</span>
+            </td>
+            <td class="table-cell">
+              <div class="complaint-info">
+                <h6 class="complaint-title mb-1">{{ c.title }}</h6>
+                <p class="complaint-desc text-muted mb-0">
+                  {{ c.description[:60] }}{% if c.description|length > 60 %}...{% endif %}
+                </p>
+              </div>
+            </td>
+            <td class="table-cell">
+              <div class="user-info">
+                <div class="user-avatar">
+                  <i class="fas fa-user"></i>
+                </div>
+                <div>
+                  <span class="user-name">{{ c.user_email.split('@')[0]|title }}</span>
+                  <small class="user-email d-block">{{ c.user_email }}</small>
+                </div>
+              </div>
+            </td>
+            <td class="table-cell">
+              <div class="status-indicator">
+                {% if c.status == 'pending' %}
+                  <span class="status-badge status-pending">
+                    <i class="fas fa-clock me-1"></i>Pending
+                  </span>
+                  <small class="status-time d-block text-muted">Awaiting review</small>
+                {% elif c.status == 'in_progress' %}
+                  <span class="status-badge status-progress">
+                    <i class="fas fa-spinner fa-spin me-1"></i>In Progress
+                  </span>
+                  <small class="status-time d-block text-muted">Under investigation</small>
+                {% else %}
+                  <span class="status-badge status-resolved">
+                    <i class="fas fa-check-circle me-1"></i>Resolved
+                  </span>
+                  {% if c.result %}
+                  <small class="status-time d-block text-muted">Resolved {{ c.created_at|time_ago }}</small>
+                  {% endif %}
+                {% endif %}
+              </div>
+            </td>
+            <td class="table-cell">
+              <div class="date-info">
+                <div class="date-display">
+                  <i class="far fa-calendar me-2"></i>
+                  {% if c.created_at is string %}
+                    {{ c.created_at }}
+                  {% else %}
+                    {{ c.created_at.strftime('%b %d, %Y') }}
+                  {% endif %}
+                </div>
+                <small class="text-muted">
+                  {% if c.created_at is string %}
+                    {{ c.created_at.split(' ')[1] if ' ' in c.created_at else '' }}
+                  {% else %}
+                    {{ c.created_at.strftime('%I:%M %p') }}
+                  {% endif %}
+                </small>
+              </div>
+            </td>
+            <td class="table-cell">
+              <div class="action-buttons">
+                <a href="{{ url_for('admin_complaint_edit', complaint_id=c.id) }}" 
+                   class="btn-action btn-edit" 
+                   data-bs-toggle="tooltip" 
+                   data-bs-placement="top" 
+                   title="Edit Complaint">
+                  <i class="fas fa-edit"></i>
+                </a>
+                
+                <button class="btn-action btn-view" 
+                        data-bs-toggle="modal" 
+                        data-bs-target="#viewModal{{ loop.index }}"
+                        data-bs-toggle="tooltip" 
+                        data-bs-placement="top" 
+                        title="View Details">
+                  <i class="fas fa-eye"></i>
+                </button>
+                
+                <form method="POST"
+                      action="{{ url_for('delete_complaint', complaint_id=c.id) }}"
+                      class="d-inline delete-form">
+                  <button type="button" 
+                          class="btn-action btn-delete" 
+                          onclick="confirmDelete(this)"
+                          data-bs-toggle="tooltip" 
+                          data-bs-placement="top" 
+                          title="Delete Complaint">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </form>
+               
+              </div>
+            </td>
+          </tr>
+
+          <!-- View Modal -->
+          <div class="modal fade" id="viewModal{{ loop.index }}" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">
+                    <i class="fas fa-file-alt me-2"></i>Complaint Details
+                  </h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                  <div class="complaint-detail-view">
+                    <div class="detail-header">
+                      <div class="detail-status">
+                        {% if c.status == 'pending' %}
+                          <span class="status-badge status-pending">
+                            <i class="fas fa-clock me-1"></i>Pending
+                          </span>
+                        {% elif c.status == 'in_progress' %}
+                          <span class="status-badge status-progress">
+                            <i class="fas fa-spinner fa-spin me-1"></i>In Progress
+                          </span>
+                        {% else %}
+                          <span class="status-badge status-resolved">
+                            <i class="fas fa-check-circle me-1"></i>Resolved
+                          </span>
+                        {% endif %}
+                      </div>
+                      <div class="detail-id">Complaint #{{ loop.index }}</div>
+                    </div>
+                    
+                    <div class="detail-body">
+                      <div class="detail-section">
+                        <h6><i class="fas fa-heading me-2"></i>Title</h6>
+                        <p>{{ c.title }}</p>
+                      </div>
+                      
+                      <div class="detail-section">
+                        <h6><i class="fas fa-align-left me-2"></i>Description</h6>
+                        <p>{{ c.description }}</p>
+                      </div>
+                      {% if c.image_path %}
+<div class="detail-section">
+  <h6><i class="fas fa-image me-2"></i>Detected Image</h6>
+
+  <div class="text-center mt-2">
+    <img src="/{{ c.image_path }}"
+         class="img-fluid rounded shadow"
+         style="max-height: 350px;"
+         alt="Detected Complaint Image">
+  </div>
+</div>
+{% endif %}
+
+                      <div class="row">
+                        <div class="col-md-6">
+                          <div class="detail-section">
+                            <h6><i class="fas fa-user me-2"></i>Submitted By</h6>
+                            <div class="user-detail">
+                              <div class="user-avatar-lg">
+                                <i class="fas fa-user"></i>
+                              </div>
+                              <div>
+                                <strong>{{ c.user_email.split('@')[0]|title }}</strong>
+                                <small class="d-block text-muted">{{ c.user_email }}</small>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-md-6">
+                          <div class="detail-section">
+                            <h6><i class="far fa-calendar me-2"></i>Submitted On</h6>
+                            <p>
+                              {% if c.created_at is string %}
+                                {{ c.created_at }}
+                              {% else %}
+                                {{ c.created_at.strftime('%B %d, %Y at %I:%M %p') }}
+                              {% endif %}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {% if c.result %}
+                      <div class="detail-section">
+                        <h6><i class="fas fa-clipboard-check me-2"></i>Resolution</h6>
+                        <div class="resolution-box">
+                          {{ c.result }}
+                        </div>
+                      </div>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <a href="{{ url_for('admin_complaint_edit', complaint_id=c.id) }}" 
+                     class="btn btn-primary">
+                     <i class="fas fa-edit me-2"></i>Edit Complaint
+                  </a>
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  {% if not complaints %}
+  <div class="empty-state-admin">
+    <div class="empty-state-icon">
+      <i class="fas fa-file-alt"></i>
+    </div>
+    <h3>No Complaints Found</h3>
+    <p class="text-muted mb-4">There are no complaints to display at the moment.</p>
+  </div>
+  {% endif %}
+
+</div>
+
+<style>
+  :root {
+    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --success-gradient: linear-gradient(135deg, #0ba360 0%, #3cba92 100%);
+    --warning-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    --info-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    --card-hover-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+  }
+
+  body {
+    font-family: 'Poppins', sans-serif;
+    background: #f8fafc;
+    min-height: 100vh;
+  }
+
+  /* Header Styles */
+  .dashboard-header {
+    padding-bottom: 1rem;
+  }
+
+  .dashboard-title {
+    font-size: 2.2rem;
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.5rem;
+  }
+
+  .dashboard-subtitle {
+    color: #64748b;
+    font-size: 1rem;
+  }
+
+  .header-border {
+    height: 4px;
+    background: var(--primary-gradient);
+    border-radius: 2px;
+    margin-top: 1rem;
+    width: 100px;
+  }
+
+  .admin-badge {
+    background: var(--primary-gradient);
+    color: white;
+    padding: 8px 20px;
+    border-radius: 20px;
+    font-weight: 500;
+    font-size: 0.9rem;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  }
+
+  .btn-refresh {
+    background: white;
+    border: 2px solid #e2e8f0;
+    width: 45px;
+    height: 45px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #64748b;
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+
+  .btn-refresh:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+    color: #667eea;
+    transform: rotate(45deg);
+  }
+
+  /* Stat Cards */
+  .stat-card-admin {
+    background: white;
+    border-radius: 20px;
+    padding: 1.5rem;
+    box-shadow: var(--card-shadow);
+    transition: all 0.4s ease;
+    height: 100%;
+    border-top: 4px solid;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .stat-card-admin:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--card-hover-shadow);
+  }
+
+  .stat-card-admin.total {
+    border-top-color: #667eea;
+  }
+
+  .stat-card-admin.pending {
+    border-top-color: #f093fb;
+  }
+
+  .stat-card-admin.progress {
+    border-top-color: #4facfe;
+  }
+
+  .stat-card-admin.resolved {
+    border-top-color: #0ba360;
+  }
+
+  .stat-card-admin h3 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 0.5rem;
+  }
+
+  .stat-icon-admin {
+    width: 60px;
+    height: 60px;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+  }
+
+  .stat-card-admin.total .stat-icon-admin {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.15), rgba(118, 75, 162, 0.1));
+    color: #667eea;
+  }
+
+  .stat-card-admin.pending .stat-icon-admin {
+    background: linear-gradient(135deg, rgba(240, 147, 251, 0.15), rgba(245, 87, 108, 0.1));
+    color: #f093fb;
+  }
+
+  .stat-card-admin.progress .stat-icon-admin {
+    background: linear-gradient(135deg, rgba(79, 172, 254, 0.15), rgba(0, 242, 254, 0.1));
+    color: #4facfe;
+  }
+
+  .stat-card-admin.resolved .stat-icon-admin {
+    background: linear-gradient(135deg, rgba(11, 163, 96, 0.15), rgba(60, 186, 146, 0.1));
+    color: #0ba360;
+  }
+
+  .stat-trend {
+    margin-top: 1rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+
+  .trend-up {
+    color: #0ba360;
+  }
+
+  .trend-warning {
+    color: #f093fb;
+  }
+
+  .trend-info {
+    color: #4facfe;
+  }
+
+  .trend-success {
+    color: #0ba360;
+  }
+
+  /* Filter Card */
+  .filter-card {
+    background: white;
+    border-radius: 20px;
+    padding: 1.5rem;
+    box-shadow: var(--card-shadow);
+    margin-bottom: 2rem;
+  }
+
+  .filter-group {
+    position: relative;
+  }
+
+  .filter-select, .filter-input {
+    background: #f8fafc;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 10px 15px;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    min-width: 200px;
+  }
+
+  .filter-select:focus, .filter-input:focus {
+    outline: none;
+    border-color: #667eea;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  }
+
+  .btn-filter-apply, .btn-filter-reset {
+    padding: 10px 25px;
+    border-radius: 12px;
+    font-weight: 500;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .btn-filter-apply {
+    background: var(--primary-gradient);
+    color: white;
+  }
+
+  .btn-filter-apply:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+  }
+
+  .btn-filter-reset {
+    background: #f1f5f9;
+    color: #64748b;
+    border: 2px solid #e2e8f0;
+  }
+
+  .btn-filter-reset:hover {
+    background: #e2e8f0;
+    border-color: #cbd5e1;
+  }
+
+  /* Premium Table */
+  .premium-table-card {
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: var(--card-shadow);
+    margin-bottom: 2rem;
+  }
+
+  .premium-table {
+    margin: 0;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+
+  .premium-table thead {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  }
+
+  .table-head {
+    padding: 1.5rem 1.5rem !important;
+    color: white;
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border: none !important;
+  }
+
+  .table-head .sort-btn {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.7);
+    margin-left: 8px;
+    cursor: pointer;
+    transition: color 0.3s ease;
+  }
+
+  .table-head .sort-btn:hover {
+    color: white;
+  }
+
+  .table-row {
+    transition: all 0.3s ease;
+    border-bottom: 1px solid #f1f5f9;
+  }
+
+  .table-row:last-child {
+    border-bottom: none;
+  }
+
+  .table-row:hover {
+    background: rgba(102, 126, 234, 0.02);
+    transform: translateX(5px);
+  }
+
+  .table-cell {
+    padding: 1.5rem !important;
+    vertical-align: middle;
+    border: none;
+  }
+
+  .complaint-id {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 35px;
+    height: 35px;
+    background: #f1f5f9;
+    border-radius: 10px;
+    font-weight: 600;
+    color: #64748b;
+  }
+
+  .complaint-title {
+    font-weight: 600;
+    color: #1e293b;
+    font-size: 1rem;
+    margin-bottom: 0.3rem;
+  }
+
+  .complaint-desc {
+    font-size: 0.85rem;
+    line-height: 1.4;
+  }
+
+  .user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .user-avatar {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1rem;
+  }
+
+  .user-avatar-lg {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.5rem;
+    margin-right: 15px;
+  }
+
+  .user-name {
+    font-weight: 600;
+    color: #1e293b;
+    display: block;
+  }
+
+  .user-email {
+    font-size: 0.8rem;
+    color: #94a3b8;
+  }
+
+  .status-indicator {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .status-badge {
+    padding: 6px 15px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: fit-content;
+  }
+
+  .status-pending {
+    background: linear-gradient(135deg, rgba(240, 147, 251, 0.15), rgba(245, 87, 108, 0.1));
+    color: #f093fb;
+    border: 1px solid rgba(240, 147, 251, 0.3);
+  }
+
+  .status-progress {
+    background: linear-gradient(135deg, rgba(79, 172, 254, 0.15), rgba(0, 242, 254, 0.1));
+    color: #4facfe;
+    border: 1px solid rgba(79, 172, 254, 0.3);
+  }
+
+  .status-resolved {
+    background: linear-gradient(135deg, rgba(11, 163, 96, 0.15), rgba(60, 186, 146, 0.1));
+    color: #0ba360;
+    border: 1px solid rgba(11, 163, 96, 0.3);
+  }
+
+  .status-time {
+    font-size: 0.8rem;
+  }
+
+  .date-info {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .date-display {
+    font-weight: 500;
+    color: #1e293b;
+    display: flex;
+    align-items: center;
+  }
+
+  .action-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .btn-action {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+    color: white;
+  }
+
+  .btn-edit {
+    background: #4facfe;
+  }
+
+  .btn-edit:hover {
+    background: #3a9bfd;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(79, 172, 254, 0.3);
+  }
+
+  .btn-view {
+    background: #0ba360;
+  }
+
+  .btn-view:hover {
+    background: #099253;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(11, 163, 96, 0.3);
+  }
+
+  .btn-delete {
+    background: #f5576c;
+  }
+
+  .btn-delete:hover {
+    background: #f34158;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(245, 87, 108, 0.3);
+  }
+
+  .btn-process {
+    background: #f093fb;
+  }
+
+  .btn-process:hover {
+    background: #ed80fb;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(240, 147, 251, 0.3);
+  }
+
+  .btn-resolve {
+    background: #0ba360;
+  }
+
+  .btn-resolve:hover {
+    background: #099253;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(11, 163, 96, 0.3);
+  }
+
+  /* Modal Styles */
+  .modal-content {
+    border-radius: 20px;
+    border: none;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+  }
+
+  .modal-header {
+    background: var(--primary-gradient);
+    color: white;
+    border-radius: 20px 20px 0 0;
+    padding: 1.5rem 2rem;
+  }
+
+  .modal-title {
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+  }
+
+  .complaint-detail-view {
+    padding: 1rem;
+  }
+
+  .detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #f1f5f9;
+  }
+
+  .detail-id {
+    font-weight: 600;
+    color: #64748b;
+    font-size: 0.95rem;
+  }
+
+  .detail-section {
+    margin-bottom: 1.5rem;
+  }
+
+  .detail-section h6 {
+    color: #667eea;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+  }
+
+  .detail-section p {
+    color: #334155;
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  .user-detail {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+
+  .resolution-box {
+    background: rgba(11, 163, 96, 0.05);
+    border-left: 4px solid #0ba360;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-top: 0.5rem;
+  }
+
+  /* Empty State */
+  .empty-state-admin {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: white;
+    border-radius: 20px;
+    box-shadow: var(--card-shadow);
+  }
+
+  .empty-state-icon {
+    width: 100px;
+    height: 100px;
+    background: var(--primary-gradient);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 2rem;
+    font-size: 3rem;
+    color: white;
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+  }
+
+  .empty-state-admin h3 {
+    color: #1e293b;
+    margin-bottom: 1rem;
+  }
+
+  /* Animations */
+  .animate-on-hover {
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .dashboard-title {
+      font-size: 1.8rem;
+    }
+    
+    .filter-card .d-flex {
+      flex-direction: column;
+      align-items: stretch !important;
+    }
+    
+    .filter-group {
+      margin-bottom: 1rem;
+    }
+    
+    .filter-select, .filter-input {
+      width: 100%;
+    }
+    
+    .action-buttons {
+      justify-content: center;
+    }
+    
+    .table-cell {
+      padding: 1rem !important;
+    }
+  }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Initialize tooltips
+  var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+  var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl);
+  });
+  
+  // Sort functionality
+  const sortButtons = document.querySelectorAll('.sort-btn');
+  let currentSort = { field: null, direction: 'asc' };
+  
+  sortButtons.forEach(btn => {
+    btn.addEventListener('click', function() {
+      const field = this.dataset.sort;
+      
+      if (currentSort.field === field) {
+        currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+      } else {
+        currentSort.field = field;
+        currentSort.direction = 'asc';
+      }
+      
+      // Reset all sort icons
+      document.querySelectorAll('.sort-btn i').forEach(icon => {
+        icon.className = 'fas fa-sort';
+      });
+      
+      // Update current sort icon
+      this.querySelector('i').className = currentSort.direction === 'asc' 
+        ? 'fas fa-sort-up' 
+        : 'fas fa-sort-down';
+      
+      sortTable(field, currentSort.direction);
+    });
+  });
+  
+  function sortTable(field, direction) {
+    const tbody = document.querySelector('#complaintsTable tbody');
+    const rows = Array.from(tbody.querySelectorAll('tr'));
+    
+    rows.sort((a, b) => {
+      let aValue, bValue;
+      
+      switch(field) {
+        case 'id':
+          aValue = parseInt(a.querySelector('.complaint-id').textContent);
+          bValue = parseInt(b.querySelector('.complaint-id').textContent);
+          break;
+        case 'title':
+          aValue = a.querySelector('.complaint-title').textContent.toLowerCase();
+          bValue = b.querySelector('.complaint-title').textContent.toLowerCase();
+          break;
+        case 'user':
+          aValue = a.querySelector('.user-name').textContent.toLowerCase();
+          bValue = b.querySelector('.user-name').textContent.toLowerCase();
+          break;
+        case 'status':
+          aValue = a.dataset.status;
+          bValue = b.dataset.status;
+          break;
+        case 'date':
+          aValue = a.querySelector('.date-display').textContent;
+          bValue = b.querySelector('.date-display').textContent;
+          break;
+      }
+      
+      if (direction === 'asc') {
+        return aValue > bValue ? 1 : -1;
+      } else {
+        return aValue < bValue ? 1 : -1;
+      }
+    });
+    
+    // Reorder rows
+    rows.forEach(row => tbody.appendChild(row));
+  }
+  
+  // Filter functionality
+  window.applyFilters = function() {
+    const statusFilter = document.getElementById('statusFilter').value;
+    const searchText = document.getElementById('searchInput').value.toLowerCase();
+    const rows = document.querySelectorAll('#complaintsTable tbody tr');
+    
+    rows.forEach(row => {
+      const status = row.dataset.status;
+      const title = row.querySelector('.complaint-title').textContent.toLowerCase();
+      const desc = row.querySelector('.complaint-desc').textContent.toLowerCase();
+      const user = row.querySelector('.user-email').textContent.toLowerCase();
+      
+      let matchesStatus = statusFilter === 'all' || status === statusFilter;
+      let matchesSearch = !searchText || 
+                         title.includes(searchText) || 
+                         desc.includes(searchText) || 
+                         user.includes(searchText);
+      
+      if (matchesStatus && matchesSearch) {
+        row.style.display = '';
+        row.classList.add('filter-match');
+      } else {
+        row.style.display = 'none';
+        row.classList.remove('filter-match');
+      }
+    });
+  };
+  
+  window.resetFilters = function() {
+    document.getElementById('statusFilter').value = 'all';
+    document.getElementById('searchInput').value = '';
+    applyFilters();
+  };
+  
+  // Delete confirmation
+  window.confirmDelete = function(button) {
+    if (confirm('Are you sure you want to delete this complaint? This action cannot be undone.')) {
+      button.closest('.delete-form').submit();
+    }
+  };
+  
+  // Status update
+  window.updateStatus = function(complaintId, newStatus) {
+    if (confirm('Update complaint status?')) {
+      // Here you would make an API call to update the status
+      // For now, we'll just show a message
+      alert('Status update functionality would be implemented with backend API');
+    }
+  };
+  
+  // Refresh data
+  window.refreshData = function() {
+    const refreshBtn = document.querySelector('.btn-refresh');
+    refreshBtn.style.animation = 'spin 1s linear infinite';
+    
+    // Simulate API call
+    setTimeout(() => {
+      refreshBtn.style.animation = '';
+      location.reload(); // In real app, this would be an API call
+    }, 1000);
+  };
+  
+  // Add CSS for spin animation
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+  `;
+  document.head.appendChild(style);
+  
+  // Apply initial filters
+  applyFilters();
+});
+</script>
+
+{% endblock %}

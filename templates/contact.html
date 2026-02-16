@@ -1,0 +1,555 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-6">
+
+    <div class="text-center mb-6" data-aos="fade-down">
+        <div class="mb-4">
+            <span class="badge bg-gradient-primary rounded-pill px-4 py-2 mb-3">
+                <i class="bi bi-chat-dots me-2"></i>Contact Us
+            </span>
+            <h1 class="display-4 fw-bold text-dark mb-3">
+                Let's Connect &<br>
+                <span class="text-gradient">Make a Difference</span>
+            </h1>
+            <p class="lead text-gray-600 mb-0 mx-auto" style="max-width: 600px;">
+                Have questions or feedback? We're here to help. Reach out to us and we'll get back to you within 24 hours.
+            </p>
+        </div>
+    </div>
+
+   
+    <div class="row g-4 mb-5">
+        <div class="col-md-4" data-aos="fade-up">
+            <div class="contact-card p-4 rounded-4 text-center hover-lift">
+                <div class="bg-gradient-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center p-3 mb-3">
+                    <i class="bi bi-envelope-fill text-primary fs-2"></i>
+                </div>
+                <h5 class="fw-bold mb-2">Email Us</h5>
+                <p class="text-muted mb-3">For general inquiries</p>
+                <a href="mailto:support@govai.com" class="text-decoration-none text-primary fw-semibold">
+                    support@govai.com
+                </a>
+            </div>
+        </div>
+        
+        <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
+            <div class="contact-card p-4 rounded-4 text-center hover-lift">
+                <div class="bg-gradient-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center p-3 mb-3">
+                    <i class="bi bi-telephone-fill text-success fs-2"></i>
+                </div>
+                <h5 class="fw-bold mb-2">Call Us</h5>
+                <p class="text-muted mb-3">Mon-Fri, 9AM-6PM</p>
+                <a href="tel:+15551234567" class="text-decoration-none text-primary fw-semibold">
+                    +1 (555) 123-4567
+                </a>
+            </div>
+        </div>
+        
+        <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+            <div class="contact-card p-4 rounded-4 text-center hover-lift">
+                <div class="bg-gradient-info bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center p-3 mb-3">
+                    <i class="bi bi-geo-alt-fill text-info fs-2"></i>
+                </div>
+                <h5 class="fw-bold mb-2">Visit Us</h5>
+                <p class="text-muted mb-3">Our headquarters</p>
+                <p class="mb-0 fw-semibold">123 Gov Street, San Francisco, CA</p>
+            </div>
+        </div>
+    </div>
+
+    
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="row g-0">
+                 
+                    <div class="col-lg-7 p-4 p-xl-5">
+                        <div class="mb-4">
+                            <h3 class="fw-bold mb-3">
+                                <i class="bi bi-send-fill text-primary me-2"></i>
+                                Send us a Message
+                            </h3>
+                            <p class="text-gray-600">Fill out the form below and we'll get back to you as soon as possible.</p>
+                        </div>
+
+                       
+                        <form method="POST" id="contactForm" class="needs-validation" novalidate>
+                            <input type="hidden" name="access_key" value="2df6e586-a09d-42f6-9d80-3542d093f0d8">
+                          
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">
+                                        <i class="bi bi-person text-primary me-2"></i>Full Name *
+                                    </label>
+                                    <div class="input-group input-group-lg">
+                                        <input type="text" name="name" class="form-control rounded-3" required
+                                            placeholder="Your name">
+                                    </div>
+                                    <div class="invalid-feedback">Please enter your name</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">
+                                        <i class="bi bi-envelope text-primary me-2"></i>Email Address *
+                                    </label>
+                                    <div class="input-group input-group-lg">
+                                        <input type="email" name="email" class="form-control rounded-3" required
+                                            placeholder="your@email.com">
+                                    </div>
+                                    <div class="invalid-feedback">Please enter a valid email</div>
+                                </div>
+                            </div>
+
+                        
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">
+                                        <i class="bi bi-phone text-primary me-2"></i>Phone Number
+                                    </label>
+                                    <div class="input-group input-group-lg">
+                                        <input type="tel" name="phone" class="form-control rounded-3"
+                                            placeholder="+1 (555) 123-4567">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">
+                                        <i class="bi bi-tag text-primary me-2"></i>Subject *
+                                    </label>
+                                    <div class="input-group input-group-lg">
+                                        <select name="subject" class="form-select rounded-3" required>
+                                            <option value="" selected disabled>Select a subject</option>
+                                            <option value="General Inquiry">General Inquiry</option>
+                                            <option value="Technical Support">Technical Support</option>
+                                            <option value="Feature Request">Feature Request</option>
+                                            <option value="Bug Report">Bug Report</option>
+                                            <option value="Partnership">Partnership</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                    </div>
+                                    <div class="invalid-feedback">Please select a subject</div>
+                                </div>
+                            </div>
+
+                          
+                            <div class="mb-4">
+                                <label class="form-label fw-semibold">
+                                    <i class="bi bi-chat-text text-primary me-2"></i>Your Message *
+                                </label>
+                                <textarea name="message" class="form-control rounded-3" rows="5" required
+                                    placeholder="How can we help you?"></textarea>
+                                <div class="invalid-feedback">Please enter your message</div>
+                            </div>
+
+                         
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-gradient-primary btn-lg py-3 rounded-3 fw-bold shadow-lg">
+                                    <i class="bi bi-send me-2"></i>Send Message
+                                    <span class="spinner-border spinner-border-sm ms-2 d-none" role="status"></span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+               
+                    <div class="col-lg-5 bg-gradient-primary text-white p-4 p-xl-5">
+                        <div class="h-100 d-flex flex-column justify-content-between">
+                            <div>
+                                <h4 class="fw-bold mb-4">
+                                    <i class="bi bi-info-circle me-2"></i>Contact Information
+                                </h4>
+                                
+                              
+                                <div class="mb-4">
+                                    <h6 class="fw-bold mb-3">Office Hours</h6>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>Monday - Friday</span>
+                                        <span class="fw-bold">9:00 AM - 6:00 PM</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>Saturday</span>
+                                        <span class="fw-bold">10:00 AM - 2:00 PM</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <span>Sunday</span>
+                                        <span class="fw-bold">Closed</span>
+                                    </div>
+                                </div>
+
+                               
+                                <div class="mb-4">
+                                    <h6 class="fw-bold mb-3">Response Time</h6>
+                                    <div class="d-flex align-items-center mb-2">
+                                        <div class="bg-white bg-opacity-20 rounded-circle p-1 me-2">
+                                            <i class="bi bi-lightning"></i>
+                                        </div>
+                                        <span>General Inquiries: Within 24 hours</span>
+                                    </div>
+                                    <div class="d-flex align-items-center mb-2">
+                                        <div class="bg-white bg-opacity-20 rounded-circle p-1 me-2">
+                                            <i class="bi bi-clock"></i>
+                                        </div>
+                                        <span>Technical Support: Within 2 hours</span>
+                                    </div>
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-white bg-opacity-20 rounded-circle p-1 me-2">
+                                            <i class="bi bi-shield-check"></i>
+                                        </div>
+                                        <span>Urgent Matters: Immediate response</span>
+                                    </div>
+                                </div>
+
+                                
+                                <div class="mb-4">
+                                    <h6 class="fw-bold mb-3">Follow Us</h6>
+                                    <div class="d-flex gap-2">
+                                        <a href="#" class="btn btn-outline-light btn-sm rounded-circle">
+                                            <i class="bi bi-twitter"></i>
+                                        </a>
+                                        <a href="#" class="btn btn-outline-light btn-sm rounded-circle">
+                                            <i class="bi bi-facebook"></i>
+                                        </a>
+                                        <a href="#" class="btn btn-outline-light btn-sm rounded-circle">
+                                            <i class="bi bi-linkedin"></i>
+                                        </a>
+                                        <a href="#" class="btn btn-outline-light btn-sm rounded-circle">
+                                            <i class="bi bi-instagram"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+
+                           
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+ 
+    <div class="row justify-content-center mt-5">
+        <div class="col-lg-8 text-center">
+            <h4 class="fw-bold mb-4">Frequently Asked Questions</h4>
+            <div class="row g-3">
+                <div class="col-md-6" data-aos="fade-up">
+                    <div class="faq-item p-3 border rounded-3 hover-lift">
+                        <h6 class="fw-bold mb-2">How long does it take to get a response?</h6>
+                        <p class="small text-muted mb-0">We typically respond within 2-4 hours during business hours.</p>
+                    </div>
+                </div>
+                <div class="col-md-6" data-aos="fade-up" data-aos-delay="100">
+                    <div class="faq-item p-3 border rounded-3 hover-lift">
+                        <h6 class="fw-bold mb-2">Can I track my issue after reporting?</h6>
+                        <p class="small text-muted mb-0">Yes, you can track all reported issues in your dashboard.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+
+<style>
+ 
+    .contact-card {
+        background: white;
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+    }
+
+    .contact-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        border-color: var(--primary);
+    }
+
+    
+    .form-control, .form-select {
+        padding: 0.75rem 1rem;
+        border: 1px solid #dee2e6;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
+    }
+
+    textarea.form-control {
+        resize: none;
+        min-height: 120px;
+    }
+
+  
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    }
+
+    .btn-outline-light:hover {
+        background-color: white;
+        color: var(--primary);
+    }
+
+    .faq-item {
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .faq-item:hover {
+        border-color: var(--primary);
+        background-color: rgba(37, 99, 235, 0.05);
+    }
+
+    .btn-gradient-primary {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        border: none;
+        color: white;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .btn-gradient-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 15px 30px rgba(37, 99, 235, 0.3);
+    }
+
+    .toastify {
+        border-radius: 12px;
+        padding: 16px 20px;
+        font-family: 'Inter', sans-serif;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        font-weight: 500;
+    }
+
+    .toastify-success {
+        background: linear-gradient(135deg, #10b981, #059669);
+    }
+
+    .toastify-error {
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+    }
+
+    .toastify-info {
+        background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    }
+
+    .toastify-warning {
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+    }
+
+    .toastify-icon {
+        font-size: 1.2rem;
+        margin-right: 10px;
+    }
+
+
+    @media (max-width: 768px) {
+        .display-4 {
+            font-size: 2.5rem;
+        }
+        
+        .card {
+            border-radius: 16px !important;
+        }
+        
+        .col-lg-5 {
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+    }
+
+    [data-bs-theme="dark"] .contact-card {
+        background: #1e2227;
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    [data-bs-theme="dark"] .form-control,
+    [data-bs-theme="dark"] .form-select {
+        background: #2d3436;
+        border-color: #444;
+        color: #e9ecef;
+    }
+</style>
+
+
+<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('contactForm');
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const spinner = submitBtn.querySelector('.spinner-border');
+
+       
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            if (!form.checkValidity()) {
+                e.stopPropagation();
+                form.classList.add('was-validated');
+                
+                
+                showToast('Please fill all required fields correctly!', 'error', 'bi-exclamation-circle');
+                return;
+            }
+
+           
+            submitBtn.disabled = true;
+            spinner.classList.remove('d-none');
+
+            const formData = new FormData(form);
+            const object = Object.fromEntries(formData);
+            const json = JSON.stringify(object);
+
+            
+            showToast('Sending your message...', 'info', 'bi-hourglass-split');
+
+           
+            fetch('https://api.web3forms.com/submit', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: json
+            })
+            .then(async (response) => {
+                const data = await response.json();
+                
+                if (response.status === 200) {
+                    showToast('Message sent successfully! We\'ll get back to you soon.', 'success', 'bi-check-circle-fill');
+                    form.reset();
+                    form.classList.remove('was-validated');
+                } else {
+                    showToast(data.message || 'Failed to send message. Please try again.', 'error', 'bi-exclamation-triangle-fill');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('Network error. Please check your connection and try again.', 'error', 'bi-wifi-off');
+            })
+            .finally(() => {
+                submitBtn.disabled = false;
+                spinner.classList.add('d-none');
+            });
+        });
+
+       
+        function showToast(message, type = 'info', icon = 'bi-info-circle') {
+            let backgroundColor;
+            let iconColor;
+            
+            switch(type) {
+                case 'success':
+                    backgroundColor = 'linear-gradient(135deg, #10b981, #059669)';
+                    iconColor = '#ffffff';
+                    break;
+                case 'error':
+                    backgroundColor = 'linear-gradient(135deg, #ef4444, #dc2626)';
+                    iconColor = '#ffffff';
+                    break;
+                case 'info':
+                    backgroundColor = 'linear-gradient(135deg, #3b82f6, #1d4ed8)';
+                    iconColor = '#ffffff';
+                    break;
+                case 'warning':
+                    backgroundColor = 'linear-gradient(135deg, #f59e0b, #d97706)';
+                    iconColor = '#ffffff';
+                    break;
+                default:
+                    backgroundColor = 'linear-gradient(135deg, #3b82f6, #1d4ed8)';
+                    iconColor = '#ffffff';
+            }
+
+            Toastify({
+                text: `
+                    <div style="display: flex; align-items: center;">
+                        <i class="bi ${icon} toastify-icon" style="color: ${iconColor};"></i>
+                        <span>${message}</span>
+                    </div>
+                `,
+                duration: 2000,
+                gravity: "top",
+                position: "right",
+                stopOnFocus: true,
+                style: {
+                    background: backgroundColor,
+                    borderRadius: "12px",
+                    padding: "16px 20px",
+                    boxShadow: "0 10px 25px rgba(0, 0, 0, 0.15)",
+                    fontFamily: "'Inter', sans-serif",
+                    fontWeight: "500",
+                    fontSize: "14px"
+                },
+                escapeMarkup: false,
+                onClick: function() {
+                    
+                    this.hideToast();
+                }
+            }).showToast();
+        }
+
+        
+        document.querySelectorAll('.faq-item').forEach(item => {
+            item.addEventListener('click', function() {
+               
+                const question = this.querySelector('h6').textContent;
+                const answer = this.querySelector('p').textContent;
+                
+                showToast(
+                    `<strong>${question}</strong><br>${answer}`,
+                    'info',
+                    'bi-question-circle'
+                );
+            });
+        });
+
+        
+        document.querySelectorAll('.contact-card a[href^="mailto"]').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const email = this.getAttribute('href').replace('mailto:', '');
+                navigator.clipboard.writeText(email).then(() => {
+                    showToast(`Copied email to clipboard: ${email}`, 'success', 'bi-clipboard-check');
+                });
+            });
+        });
+
+        document.querySelectorAll('.contact-card a[href^="tel"]').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const phone = this.getAttribute('href').replace('tel:', '');
+                navigator.clipboard.writeText(phone).then(() => {
+                    showToast(`Copied phone number to clipboard: ${phone}`, 'success', 'bi-clipboard-check');
+                });
+            });
+        });
+
+       
+        const inputs = form.querySelectorAll('.form-control, .form-select');
+        inputs.forEach(input => {
+            input.addEventListener('focus', function() {
+                this.parentElement.style.transform = 'translateY(-2px)';
+            });
+            
+            input.addEventListener('blur', function() {
+                this.parentElement.style.transform = '';
+            });
+        });
+
+       
+        const demoBtn = document.createElement('button');
+        demoBtn.className = 'btn btn-secondary btn-sm position-fixed';
+        demoBtn.style.bottom = '20px';
+        demoBtn.style.right = '20px';
+        demoBtn.style.zIndex = '1000';
+        demoBtn.innerHTML = '<i class="bi bi-bell me-1"></i>Test Toast';
+        demoBtn.addEventListener('click', function() {
+            showToast('This is a test notification! Everything is working perfectly.', 'success', 'bi-check-circle-fill');
+        });
+        document.body.appendChild(demoBtn);
+    });
+</script>
+{% endblock %}

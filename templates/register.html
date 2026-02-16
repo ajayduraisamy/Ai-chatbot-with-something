@@ -1,0 +1,424 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-xl-8">
+      <!-- Header -->
+      <div class="text-center mb-5" data-aos="fade-down">
+        <div class="mb-4">
+          <div class="bg-gradient-primary rounded-circle d-inline-flex align-items-center justify-content-center p-3 mb-3">
+            <i class="bi bi-person-plus-fill text-white fs-2"></i>
+          </div>
+          <h1 class="fw-bold mb-3">Join GovAI Tracker</h1>
+          <p class="text-gray-600 lead">Create your account and start making a difference in your community</p>
+        </div>
+      </div>
+
+      <!-- Registration Card -->
+      <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+        <div class="row g-0">
+          <!-- Form Section -->
+          <div class="col-lg-7 p-4 p-xl-5">
+            <form method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+              
+              <!-- Personal Information -->
+              <div class="mb-4">
+                <h5 class="fw-bold text-dark mb-3 border-bottom pb-2">
+                  <i class="bi bi-person-circle me-2"></i>Personal Information
+                </h5>
+                
+                <!-- Name -->
+                <div class="mb-3">
+                  <label class="form-label fw-semibold">Full Name *</label>
+                  <div class="input-group input-group-lg">
+                    <span class="input-group-text bg-light border-end-0">
+                      <i class="bi bi-person text-primary"></i>
+                    </span>
+                    <input type="text" name="name" class="form-control border-start-0" required
+                      placeholder="Enter your full name">
+                  </div>
+                  <div class="invalid-feedback">Please enter your full name</div>
+                </div>
+
+                <!-- Email -->
+                <div class="mb-3">
+                  <label class="form-label fw-semibold">Email Address *</label>
+                  <div class="input-group input-group-lg">
+                    <span class="input-group-text bg-light border-end-0">
+                      <i class="bi bi-envelope text-primary"></i>
+                    </span>
+                    <input type="email" name="email" class="form-control border-start-0" required
+                      placeholder="your.email@example.com">
+                  </div>
+                  <div class="invalid-feedback">Please enter a valid email address</div>
+                </div>
+
+                <!-- Phone -->
+                <div class="mb-4">
+                  <label class="form-label fw-semibold">Phone Number *</label>
+                  <div class="input-group input-group-lg">
+                    <span class="input-group-text bg-light border-end-0">
+                      <i class="bi bi-phone text-primary"></i>
+                    </span>
+                    <input type="text" name="number" class="form-control border-start-0" required
+                      pattern="[0-9]{10}" placeholder="9876543210">
+                  </div>
+                  <div class="invalid-feedback">Please enter a 10-digit phone number</div>
+                </div>
+              </div>
+
+              <!-- Account Security -->
+              <div class="mb-4">
+                <h5 class="fw-bold text-dark mb-3 border-bottom pb-2">
+                  <i class="bi bi-shield-lock me-2"></i>Account Security
+                </h5>
+                
+                <!-- Password -->
+                <div class="mb-3">
+                  <label class="form-label fw-semibold">Password *</label>
+                  <div class="input-group input-group-lg">
+                    <span class="input-group-text bg-light border-end-0">
+                      <i class="bi bi-key text-primary"></i>
+                    </span>
+                    <input type="password" name="password" class="form-control border-start-0" required
+                      minlength="6" placeholder="Create a strong password">
+                    <button class="btn btn-outline-secondary toggle-password" type="button">
+                      <i class="bi bi-eye"></i>
+                    </button>
+                  </div>
+                  <div class="invalid-feedback">Password must be at least 6 characters</div>
+                  <div class="form-text small">Use a mix of letters, numbers, and symbols</div>
+                </div>
+              </div>
+
+              <!-- Profile Picture -->
+              <div class="mb-4">
+                <h5 class="fw-bold text-dark mb-3 border-bottom pb-2">
+                  <i class="bi bi-image me-2"></i>Profile Picture
+                </h5>
+                
+                <div class="file-upload-area border rounded-3 p-4 text-center bg-light">
+                  <div class="mb-3">
+                    <i class="bi bi-cloud-arrow-up text-primary fs-1"></i>
+                  </div>
+                  <input type="file" id="profile_image" name="profile_image" 
+                    class="form-control d-none" accept="image/*" required>
+                  <label for="profile_image" class="btn btn-outline-primary rounded-pill px-4">
+                    <i class="bi bi-upload me-2"></i>Upload Photo
+                  </label>
+                  <p class="small text-muted mt-2 mb-1" id="file-name">PNG, JPG or GIF (Max. 5MB)</p>
+                </div>
+                <div class="invalid-feedback">Please upload a profile picture</div>
+              </div>
+
+              <!-- Role Selection -->
+              <div class="mb-4">
+                <h5 class="fw-bold text-dark mb-3 border-bottom pb-2">
+                  <i class="bi bi-person-badge me-2"></i>Select Your Role
+                </h5>
+                
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <div class="role-card p-3 border rounded-3 cursor-pointer">
+                      <input type="radio" name="role" id="role_admin" value="admin" class="d-none" required>
+                      <label for="role_admin" class="d-block cursor-pointer text-center">
+                        <div class="mb-2">
+                          <i class="bi bi-shield-check text-primary fs-2"></i>
+                        </div>
+                        <h6 class="fw-bold mb-1">Administrator</h6>
+                        <p class="small text-muted mb-0">Manage platform operations</p>
+                      </label>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="role-card p-3 border rounded-3 cursor-pointer">
+                      <input type="radio" name="role" id="role_user" value="user" class="d-none" checked>
+                      <label for="role_user" class="d-block cursor-pointer text-center">
+                        <div class="mb-2">
+                          <i class="bi bi-person-check text-success fs-2"></i>
+                        </div>
+                        <h6 class="fw-bold mb-1">Citizen User</h6>
+                        <p class="small text-muted mb-0">Report and track issues</p>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+                <div class="invalid-feedback d-block">Please select a role</div>
+              </div>
+
+              <!-- Submit Button -->
+            <button type="submit" class="btn btn-primary btn-lg py-3 rounded-3 fw-bold" id="submitBtn">
+  <span class="btn-text">
+    <i class="bi bi-person-plus me-2"></i>Create My Account
+  </span>
+  <span class="btn-loader d-none">
+    <span class="spinner-border spinner-border-sm me-2"></span> Please wait...
+  </span>
+</button>
+
+
+              <!-- Login Link -->
+              <div class="text-center mt-4 pt-3 border-top">
+                <p class="mb-0 text-gray-600">
+                  Already have an account? 
+                  <a href="{{ url_for('login') }}" class="text-decoration-none fw-bold text-primary">
+                    Sign In Here
+                  </a>
+                </p>
+              </div>
+
+            </form>
+          </div>
+
+          <!-- Benefits Sidebar -->
+          <div class="col-lg-5 bg-gradient-primary text-white p-4 p-xl-5">
+            <div class="h-100 d-flex flex-column justify-content-between">
+              <div>
+                <h4 class="fw-bold mb-4">
+                  <i class="bi bi-stars me-2"></i>Why Join Us?
+                </h4>
+                
+                <div class="mb-4">
+                  <div class="d-flex align-items-center mb-3">
+                    <div class="bg-white bg-opacity-20 rounded-circle p-2 me-3">
+                      <i class="bi bi-cpu"></i>
+                    </div>
+                    <div>
+                      <h6 class="fw-bold mb-0">AI-Powered Solutions</h6>
+                      <small class="opacity-75">Smart issue detection and categorization</small>
+                    </div>
+                  </div>
+
+                  <div class="d-flex align-items-center mb-3">
+                    <div class="bg-white bg-opacity-20 rounded-circle p-2 me-3">
+                      <i class="bi bi-speedometer2"></i>
+                    </div>
+                    <div>
+                      <h6 class="fw-bold mb-0">Fast Response Time</h6>
+                      <small class="opacity-75">Issues resolved 65% faster</small>
+                    </div>
+                  </div>
+
+                  <div class="d-flex align-items-center mb-3">
+                    <div class="bg-white bg-opacity-20 rounded-circle p-2 me-3">
+                      <i class="bi bi-shield-check"></i>
+                    </div>
+                    <div>
+                      <h6 class="fw-bold mb-0">Secure Platform</h6>
+                      <small class="opacity-75">Enterprise-grade security</small>
+                    </div>
+                  </div>
+
+                  <div class="d-flex align-items-center mb-3">
+                    <div class="bg-white bg-opacity-20 rounded-circle p-2 me-3">
+                      <i class="bi bi-graph-up"></i>
+                    </div>
+                    <div>
+                      <h6 class="fw-bold mb-0">Real-time Tracking</h6>
+                      <small class="opacity-75">Monitor issue progress live</small>
+                    </div>
+                  </div>
+
+                  <div class="d-flex align-items-center">
+                    <div class="bg-white bg-opacity-20 rounded-circle p-2 me-3">
+                      <i class="bi bi-chat-heart"></i>
+                    </div>
+                    <div>
+                      <h6 class="fw-bold mb-0">Community Impact</h6>
+                      <small class="opacity-75">Join 50,000+ active citizens</small>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="border-top border-white border-opacity-25 pt-4 mt-4">
+                <div class="text-center">
+                  <i class="bi bi-award fs-1 mb-3 opacity-75"></i>
+                  <h6 class="fw-bold">Trusted Platform</h6>
+                  <small class="opacity-75">Used by municipalities across the country</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Additional Info -->
+      <div class="text-center mt-4">
+        <p class="text-muted small mb-0">
+          By creating an account, you agree to our 
+          <a href="#" class="text-decoration-none">Terms of Service</a> and 
+          <a href="#" class="text-decoration-none">Privacy Policy</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .card {
+    border-radius: 20px;
+    overflow: hidden;
+  }
+  .role-card.active {
+  border: 2px solid #198754 !important; 
+  background-color: rgba(25, 135, 84, 0.08);
+}
+
+  .bg-gradient-primary {
+    background: linear-gradient(135deg, #2c3e50, #4a6491);
+  }
+  
+  .form-control {
+    border: 1px solid #dee2e6;
+    padding: 0.75rem 1rem;
+    transition: all 0.3s ease;
+  }
+  
+  .form-control:focus {
+    border-color: #2c3e50;
+    box-shadow: 0 0 0 0.25rem rgba(44, 62, 80, 0.15);
+  }
+  
+  .input-group-text {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+  }
+  
+  .file-upload-area {
+    border: 2px dashed #dee2e6;
+    transition: all 0.3s ease;
+  }
+  
+  .file-upload-area:hover {
+    border-color: #2c3e50;
+    background-color: rgba(44, 62, 80, 0.05);
+  }
+  
+  .role-card {
+    transition: all 0.3s ease;
+    height: 100%;
+  }
+  
+  .role-card:hover {
+    border-color: #2c3e50 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  }
+  
+  input[type="radio"]:checked + label .role-card {
+    border-color: #2c3e50 !important;
+    background-color: rgba(44, 62, 80, 0.05);
+  }
+  
+  .cursor-pointer {
+    cursor: pointer;
+  }
+  
+  .btn-primary {
+    background: linear-gradient(135deg, #2c3e50, #34495e);
+    border: none;
+    transition: all 0.3s ease;
+  }
+  
+  .btn-primary:hover {
+    background: linear-gradient(135deg, #34495e, #2c3e50);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(44, 62, 80, 0.2);
+  }
+  
+  .toggle-password {
+    border-left: 0;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 992px) {
+    .col-lg-5 {
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .card {
+      margin: 0 1rem;
+    }
+  }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+  const form = document.querySelector('form.needs-validation');
+  const submitBtn = document.getElementById('submitBtn');
+  const btnText = submitBtn.querySelector('.btn-text');
+  const btnLoader = submitBtn.querySelector('.btn-loader');
+
+  // Bootstrap validation
+  form.addEventListener('submit', function (event) {
+
+    if (!form.checkValidity()) {
+      event.preventDefault();
+      event.stopPropagation();
+      form.classList.add('was-validated');
+      return;
+    }
+
+    event.preventDefault(); // stop instant submit
+
+    // Show loader
+    submitBtn.disabled = true;
+    btnText.classList.add('d-none');
+    btnLoader.classList.remove('d-none');
+
+    // Submit after 2 seconds
+    setTimeout(() => {
+      form.submit();
+    }, 2000);
+  });
+
+  // Password toggle
+  document.querySelectorAll('.toggle-password').forEach(button => {
+    button.addEventListener('click', function () {
+      const input = this.closest('.input-group').querySelector('input');
+      const icon = this.querySelector('i');
+      if (input.type === "password") {
+        input.type = "text";
+        icon.classList.replace('bi-eye', 'bi-eye-slash');
+      } else {
+        input.type = "password";
+        icon.classList.replace('bi-eye-slash', 'bi-eye');
+      }
+    });
+  });
+  
+document.querySelectorAll('.role-card input[type="radio"]').forEach(function(radio) {
+  radio.addEventListener('change', function() {
+    document.querySelectorAll('.role-card').forEach(function(card) {
+      card.classList.remove('active');
+    });
+
+    this.closest('.role-card').classList.add('active');
+  });
+});
+
+// Trigger default selection
+document.querySelector('.role-card input[type="radio"]:checked')
+  ?.dispatchEvent(new Event('change'));
+
+  // File upload name
+  const fileInput = document.getElementById('profile_image');
+  const fileName = document.getElementById('file-name');
+
+  fileInput.addEventListener('change', function () {
+    if (this.files.length > 0) {
+      fileName.textContent = this.files[0].name;
+      fileName.classList.remove('text-muted');
+      fileName.classList.add('text-primary', 'fw-bold');
+    }
+  });
+
+});
+</script>
+
+{% endblock %}

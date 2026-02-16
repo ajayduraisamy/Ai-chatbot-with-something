@@ -1,0 +1,568 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<div class="container mt-4 pt-3">
+
+    <!-- Header Section -->
+    <div class="dashboard-header mb-5">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="dashboard-title fw-bold">Admin Dashboard</h1>
+                <p class="dashboard-subtitle">Monitor and manage your application</p>
+            </div>
+            <div class="d-flex align-items-center">
+                <div class="admin-badge">
+                    <i class="fas fa-shield-alt me-2"></i>Super Admin
+                </div>
+                <div class="notification-bell ms-3">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-dot"></span>
+                </div>
+            </div>
+        </div>
+        <div class="header-border"></div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row mb-5 ">
+      
+        <div class="col-md-6 col-xl-6">
+            <div class="stat-card card-orders animate-on-hover">
+                <div class="card-decoration"></div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <p class="card-label">TOTAL COMPLAINTS</p>
+                            <h2 class="card-value">{{ total_complaints }}</h2>
+                        </div>
+                        <div class="stat-icon">
+                            <i class="fas fa-exclamation-circle"></i>
+                        </div>
+                    </div>
+                    <div class="card-footer-stats">
+                        <span class="trend-up"><i class="fas fa-arrow-up me-1"></i>12%</span>
+                        <span class="ms-2">From last month</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Users Card -->
+        <div class="col-md-12 col-xl-6">
+            <div class="stat-card card-users animate-on-hover">
+                <div class="card-decoration"></div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <p class="card-label">TOTAL USERS</p>
+                            <h2 class="card-value">{{ total_users }}</h2>
+                        </div>
+                        <div class="stat-icon">
+                            <i class="fas fa-user-friends"></i>
+                        </div>
+                    </div>
+                    <div class="card-footer-stats">
+                        <span class="trend-up"><i class="fas fa-arrow-up me-1"></i>8%</span>
+                        <span class="ms-2">From last month</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        
+
+       
+    </div>
+
+    <!-- Action Cards -->
+    <div class="row mb-5">
+        <div class="col-12 mb-4">
+            <h3 class="section-title">Quick Actions</h3>
+            <p class="section-subtitle">Manage your platform efficiently</p>
+        </div>
+        
+        <div class="col-md-6 col-lg-6 mb-4">
+            <a href="{{ url_for('admin_complaints') }}" class="action-card animate-on-hover">
+                <div class="action-icon">
+                    <i class="fas fa-tools"></i>
+                </div>
+                <h4>Manage Complaints</h4>
+                <p>Review and resolve user complaints</p>
+                <div class="action-footer">
+                    <span>View Details <i class="fas fa-arrow-right ms-1"></i></span>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-6 col-lg-6 mb-4">
+            <a href="{{ url_for('admin_users') }}" class="action-card animate-on-hover">
+                <div class="action-icon">
+                    <i class="fas fa-user-cog"></i>
+                </div>
+                <h4>User Management</h4>
+                <p>Manage user accounts and permissions</p>
+                <div class="action-footer">
+                    <span>View Details <i class="fas fa-arrow-right ms-1"></i></span>
+                </div>
+            </a>
+        </div>
+
+        
+        
+    </div>
+
+    
+
+</div>
+
+<style>
+    :root {
+        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --success-gradient: linear-gradient(135deg, #0ba360 0%, #3cba92 100%);
+        --warning-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        --info-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        --card-hover-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+    }
+
+    body {
+        font-family: 'Poppins', sans-serif;
+        background: #f8fafc;
+    }
+
+    /* Header Styles */
+    .dashboard-header {
+        padding-bottom: 1rem;
+    }
+
+    .dashboard-title {
+        font-size: 2.5rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 0.5rem;
+    }
+
+    .dashboard-subtitle {
+        color: #64748b;
+        font-size: 1.1rem;
+    }
+
+    .header-border {
+        height: 4px;
+        background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+        border-radius: 2px;
+        margin-top: 1rem;
+        width: 100px;
+    }
+
+    .admin-badge {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 8px 20px;
+        border-radius: 20px;
+        font-weight: 500;
+        font-size: 0.9rem;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .notification-bell {
+        position: relative;
+        width: 45px;
+        height: 45px;
+        background: white;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        color: #64748b;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+    }
+
+    .notification-bell:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+        color: #667eea;
+    }
+
+    .notification-dot {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        width: 8px;
+        height: 8px;
+        background: #f5576c;
+        border-radius: 50%;
+        border: 2px solid white;
+    }
+
+    /* Stat Cards */
+    .stat-card {
+        background: white;
+        border-radius: 20px;
+        padding: 1.5rem;
+        box-shadow: var(--card-shadow);
+        transition: all 0.4s ease;
+        position: relative;
+        overflow: hidden;
+        height: 100%;
+        border: 1px solid rgba(0, 0, 0, 0.03);
+    }
+
+    .stat-card:hover {
+        transform: translateY(-8px);
+        box-shadow: var(--card-hover-shadow);
+    }
+
+    .card-decoration {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: linear-gradient(90deg, #667eea, #764ba2);
+    }
+
+    .card-orders .card-decoration {
+        background: linear-gradient(90deg, #667eea, #764ba2);
+    }
+
+    .card-users .card-decoration {
+        background: linear-gradient(90deg, #0ba360, #3cba92);
+    }
+
+    .card-providers .card-decoration {
+        background: linear-gradient(90deg, #f093fb, #f5576c);
+    }
+
+    .card-revenue .card-decoration {
+        background: linear-gradient(90deg, #4facfe, #00f2fe);
+    }
+
+    .card-label {
+        color: #94a3b8;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.5rem;
+    }
+
+    .card-value {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 0;
+        line-height: 1;
+    }
+
+    .stat-icon {
+        width: 55px;
+        height: 55px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-orders .stat-icon {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    .card-users .stat-icon {
+        background: linear-gradient(135deg, #0ba360 0%, #3cba92 100%);
+        color: white;
+    }
+
+    .card-providers .stat-icon {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+    }
+
+    .card-revenue .stat-icon {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        color: white;
+    }
+
+    .card-footer-stats {
+        margin-top: 1rem;
+        font-size: 0.9rem;
+        color: #64748b;
+    }
+
+    .trend-up {
+        color: #0ba360;
+        font-weight: 600;
+    }
+
+    .trend-down {
+        color: #f5576c;
+        font-weight: 600;
+    }
+
+    /* Action Cards */
+    .section-title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 0.5rem;
+    }
+
+    .section-subtitle {
+        color: #64748b;
+        margin-bottom: 2rem;
+    }
+
+    .action-card {
+        display: block;
+        background: white;
+        border-radius: 20px;
+        padding: 2rem;
+        text-align: center;
+        box-shadow: var(--card-shadow);
+        transition: all 0.4s ease;
+        height: 100%;
+        color: inherit;
+        text-decoration: none;
+        border: 1px solid rgba(0, 0, 0, 0.03);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .action-card:hover {
+        transform: translateY(-8px);
+        box-shadow: var(--card-hover-shadow);
+        color: inherit;
+        text-decoration: none;
+    }
+
+    .action-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: linear-gradient(90deg, #667eea, #764ba2);
+    }
+
+    .action-card:nth-child(1)::before {
+        background: linear-gradient(90deg, #667eea, #764ba2);
+    }
+
+    .action-card:nth-child(2)::before {
+        background: linear-gradient(90deg, #0ba360, #3cba92);
+    }
+
+    .action-card:nth-child(3)::before {
+        background: linear-gradient(90deg, #f093fb, #f5576c);
+    }
+
+    .action-card:nth-child(4)::before {
+        background: linear-gradient(90deg, #4facfe, #00f2fe);
+    }
+
+    .action-icon {
+        width: 70px;
+        height: 70px;
+        border-radius: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        font-size: 2rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    .action-card:nth-child(1) .action-icon {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .action-card:nth-child(2) .action-icon {
+        background: linear-gradient(135deg, #0ba360 0%, #3cba92 100%);
+    }
+
+    .action-card:nth-child(3) .action-icon {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+
+    .action-card:nth-child(4) .action-icon {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    }
+
+    .action-card h4 {
+        font-weight: 700;
+        margin-bottom: 0.7rem;
+        color: #1e293b;
+        font-size: 1.3rem;
+    }
+
+    .action-card p {
+        color: #64748b;
+        font-size: 0.95rem;
+        margin-bottom: 1.5rem;
+        line-height: 1.5;
+    }
+
+    .action-footer {
+        color: #667eea;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    .action-footer i {
+        transition: transform 0.3s ease;
+    }
+
+    .action-card:hover .action-footer i {
+        transform: translateX(5px);
+    }
+
+    /* Activity Card */
+    .activity-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: var(--card-shadow);
+        overflow: hidden;
+    }
+
+    .activity-card .card-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 1.5rem 2rem;
+    }
+
+    .activity-card .card-header h3 {
+        margin: 0;
+        font-size: 1.4rem;
+        font-weight: 600;
+    }
+
+    .activity-card .card-body {
+        padding: 1.5rem 2rem;
+    }
+
+    .activity-item {
+        display: flex;
+        align-items: flex-start;
+        padding: 1rem 0;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .activity-item:last-child {
+        border-bottom: none;
+    }
+
+    .activity-icon {
+        width: 45px;
+        height: 45px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1rem;
+        font-size: 1.2rem;
+        flex-shrink: 0;
+    }
+
+    .activity-icon.success {
+        background: rgba(11, 163, 96, 0.1);
+        color: #0ba360;
+    }
+
+    .activity-icon.warning {
+        background: rgba(245, 87, 108, 0.1);
+        color: #f5576c;
+    }
+
+    .activity-icon.info {
+        background: rgba(79, 172, 254, 0.1);
+        color: #4facfe;
+    }
+
+    .activity-content h5 {
+        font-weight: 600;
+        margin-bottom: 0.3rem;
+        color: #1e293b;
+    }
+
+    .activity-content p {
+        color: #64748b;
+        font-size: 0.9rem;
+        margin: 0;
+    }
+
+    /* Animations */
+    .animate-on-hover {
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .dashboard-title {
+            font-size: 2rem;
+        }
+        
+        .card-value {
+            font-size: 2rem;
+        }
+        
+        .action-card {
+            padding: 1.5rem;
+        }
+        
+        .action-icon {
+            width: 60px;
+            height: 60px;
+            font-size: 1.7rem;
+        }
+    }
+
+    /* Glow effects */
+    .stat-card:hover .stat-icon {
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+    }
+</style>
+
+<!-- Add smooth scroll and hover effects -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add hover animation to all stat and action cards
+        const cards = document.querySelectorAll('.animate-on-hover');
+        
+        cards.forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-8px)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+        
+        // Add subtle animation to notification bell
+        const notificationBell = document.querySelector('.notification-bell');
+        if (notificationBell) {
+            notificationBell.addEventListener('click', function() {
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 150);
+            });
+        }
+    });
+</script>
+
+{% endblock %}

@@ -1,0 +1,651 @@
+{% extends "base.html" %}
+{% block content %}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<div class="container py-5">
+
+  <!-- Header Section -->
+  <div class="dashboard-header mb-5">
+    <div class="d-flex justify-content-between align-items-center">
+      <div>
+        <h1 class="dashboard-title fw-bold">My Complaints</h1>
+        <p class="dashboard-subtitle">Track and manage all your filed complaints</p>
+      </div>
+      <div>
+        <span class="complaint-count-badge">
+          <i class="fas fa-file-alt me-2"></i>{{ complaints|length }} Complaint{{ 's' if complaints|length != 1 else '' }}
+        </span>
+      </div>
+    </div>
+    <div class="header-border"></div>
+  </div>
+
+
+  <!-- Stats Overview -->
+  <div class="row mb-5 g-4">
+    <div class="col-md-4">
+      <div class="stat-card-small pending animate-on-hover">
+        <div class="d-flex align-items-center">
+          <div class="stat-icon-small">
+            <i class="fas fa-clock"></i>
+          </div>
+          <div class="ms-3">
+            <h3 class="mb-0">{{ complaints|selectattr('status', 'equalto', 'pending')|list|length }}</h3>
+            <p class="text-muted mb-0">Pending</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="stat-card-small progress animate-on-hover">
+        <div class="d-flex align-items-center">
+          <div class="stat-icon-small">
+            <i class="fas fa-spinner"></i>
+          </div>
+          <div class="ms-3">
+            <h3 class="mb-0">{{ complaints|selectattr('status', 'equalto', 'in_progress')|list|length }}</h3>
+            <p class="text-muted mb-0">In Progress</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="stat-card-small resolved animate-on-hover">
+        <div class="d-flex align-items-center">
+          <div class="stat-icon-small">
+            <i class="fas fa-check-circle"></i>
+          </div>
+          <div class="ms-3">
+            <h3 class="mb-0">{{ complaints|selectattr('status', 'equalto', 'resolved')|list|length }}</h3>
+            <p class="text-muted mb-0">Resolved</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Complaints Cards Grid -->
+  {% if complaints %}
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+      {% for c in complaints %}
+      <div class="col">
+        <div class="complaint-card animate-on-hover">
+          <!-- Card Header with Status -->
+          <div class="complaint-card-header {% if c.status == 'pending' %}status-pending
+            {% elif c.status == 'in_progress' %}status-in-progress
+            {% else %}status-resolved{% endif %}">
+            <div class="d-flex justify-content-between align-items-center">
+              <span class="complaint-id">#{{ loop.index }}</span>
+              <span class="status-badge {% if c.status == 'pending' %}badge-pending
+                {% elif c.status == 'in_progress' %}badge-in-progress
+                {% else %}badge-resolved{% endif %}">
+                {% if c.status == 'pending' %}
+                  <i class="fas fa-clock me-1"></i>Pending
+                {% elif c.status == 'in_progress' %}
+                  <i class="fas fa-spinner me-1"></i>In Progress
+                {% else %}
+                  <i class="fas fa-check-circle me-1"></i>Resolved
+                {% endif %}
+              </span>
+            </div>
+          </div>
+
+          <!-- Image Section -->
+          <div class="complaint-image-section">
+           {% if c.image_path %}
+  <img src="/{{ c.image_path }}"
+       class="complaint-image"
+       alt="Complaint Image"
+       data-bs-toggle="modal"
+       data-bs-target="#imageModal{{ loop.index }}">
+{% else %}
+  <div class="no-image-placeholder">
+    <i class="fas fa-image"></i>
+    <p>No Image Available</p>
+  </div>
+{% endif %}
+
+          </div>
+
+          <!-- Card Body -->
+          <div class="complaint-card-body">
+            <h5 class="complaint-title">{{ c.title }}</h5>
+            <p class="complaint-description">{{ c.description[:120] }}{% if c.description|length > 120 %}...{% endif %}</p>
+            
+            <!-- Result Section -->
+            {% if c.result %}
+            <div class="result-section">
+              <h6><i class="fas fa-clipboard-check me-2"></i>Resolution</h6>
+              <p class="result-text">{{ c.result }}</p>
+            </div>
+            {% endif %}
+          </div>
+
+          <!-- Card Footer -->
+          <div class="complaint-card-footer">
+            <div class="d-flex justify-content-between align-items-center">
+              <div class="date-info">
+                <i class="far fa-calendar me-1"></i>
+                <small>{{ c.created_at.strftime('%b %d, %Y') if c.created_at is string == false else c.created_at }}</small>
+              </div>
+              <div class="action-buttons">
+                {% if c.status == 'pending' %}
+                  <span class="badge bg-light text-dark">
+                    <i class="fas fa-hourglass-half me-1"></i>Awaiting Review
+                  </span>
+                {% elif c.status == 'in_progress' %}
+                  <span class="badge bg-light text-dark">
+                    <i class="fas fa-cogs me-1"></i>Under Process
+                  </span>
+                {% else %}
+                  <button class="btn-view-result" 
+                          data-bs-toggle="modal" 
+                          data-bs-target="#resultModal{{ loop.index }}">
+                    <i class="fas fa-eye me-1"></i>View Details
+                  </button>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Image Modal -->
+      {% if c.image_path %}
+      <div class="modal fade" id="imageModal{{ loop.index }}" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Complaint Image - {{ c.title }}</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+            <img src="/{{ c.image_path }}"
+     class="img-fluid rounded"
+     alt="Complaint Image">
+
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Result Detail Modal -->
+      {% if c.result %}
+      <div class="modal fade" id="resultModal{{ loop.index }}" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">
+                <i class="fas fa-clipboard-check me-2"></i>Resolution Details
+              </h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+              <div class="alert alert-success">
+                <h6><i class="fas fa-check-circle me-2"></i>Complaint Resolved</h6>
+                <p class="mb-0">Your complaint has been successfully resolved.</p>
+              </div>
+              <div class="mt-3">
+                <h6>Complaint Title:</h6>
+                <p class="text-muted">{{ c.title }}</p>
+                
+                <h6 class="mt-3">Resolution:</h6>
+                <div class="p-3 bg-light rounded">
+                  {{ c.result }}
+                </div>
+                
+                <div class="mt-4">
+                  <small class="text-muted">
+                    <i class="far fa-calendar me-1"></i>
+                    Filed on: {{ c.created_at.strftime('%B %d, %Y at %I:%M %p') if c.created_at is string == false else c.created_at }}
+                  </small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+      {% endfor %}
+    </div>
+  {% else %}
+    <!-- Empty State -->
+    <div class="empty-state">
+      <div class="empty-state-icon">
+        <i class="fas fa-file-alt"></i>
+      </div>
+      <h3>No Complaints Yet</h3>
+      <p class="text-muted mb-4">You haven't filed any complaints yet. Start by filing your first complaint.</p>
+      <a href="{{ url_for('file_complaint') }}" class="btn btn-primary btn-lg">
+        <i class="fas fa-plus me-2"></i>File New Complaint
+      </a>
+    </div>
+  {% endif %}
+
+</div>
+
+<style>
+  :root {
+    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --pending-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    --progress-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    --resolved-gradient: linear-gradient(135deg, #0ba360 0%, #3cba92 100%);
+    --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    --card-hover-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+  }
+
+  body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    min-height: 100vh;
+  }
+
+  /* Header Styles */
+  .dashboard-header {
+    padding-bottom: 1rem;
+  }
+
+  .dashboard-title {
+    font-size: 2.5rem;
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.5rem;
+  }
+
+  .dashboard-subtitle {
+    color: #64748b;
+    font-size: 1.1rem;
+  }
+
+  .header-border {
+    height: 4px;
+    background: var(--primary-gradient);
+    border-radius: 2px;
+    margin-top: 1rem;
+    width: 100px;
+  }
+
+  .complaint-count-badge {
+    background: var(--primary-gradient);
+    color: white;
+    padding: 10px 25px;
+    border-radius: 25px;
+    font-weight: 500;
+    font-size: 1rem;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  }
+
+  /* Alert Premium */
+  .alert-premium {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    border-left: 5px solid;
+  }
+
+  .alert-success.alert-premium {
+    background: linear-gradient(90deg, rgba(11, 163, 96, 0.1), rgba(60, 186, 146, 0.05));
+    border-left-color: #0ba360;
+  }
+
+  .alert-danger.alert-premium {
+    background: linear-gradient(90deg, rgba(245, 87, 108, 0.1), rgba(240, 147, 251, 0.05));
+    border-left-color: #f5576c;
+  }
+
+  .alert-warning.alert-premium {
+    background: linear-gradient(90deg, rgba(245, 158, 11, 0.1), rgba(251, 202, 147, 0.05));
+    border-left-color: #f59e0b;
+  }
+
+  /* Small Stat Cards */
+  .stat-card-small {
+    background: white;
+    border-radius: 20px;
+    padding: 1.5rem;
+    box-shadow: var(--card-shadow);
+    transition: all 0.4s ease;
+    height: 100%;
+    border: 1px solid rgba(0, 0, 0, 0.03);
+  }
+
+  .stat-card-small:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--card-hover-shadow);
+  }
+
+  .stat-card-small.pending {
+    border-top: 4px solid #f093fb;
+  }
+
+  .stat-card-small.progress {
+    border-top: 4px solid #4facfe;
+  }
+
+  .stat-card-small.resolved {
+    border-top: 4px solid #0ba360;
+  }
+
+  .stat-icon-small {
+    width: 55px;
+    height: 55px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+  }
+
+  .stat-card-small.pending .stat-icon-small {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+  }
+
+  .stat-card-small.progress .stat-icon-small {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    color: white;
+  }
+
+  .stat-card-small.resolved .stat-icon-small {
+    background: linear-gradient(135deg, #0ba360 0%, #3cba92 100%);
+    color: white;
+  }
+
+  /* Complaint Cards */
+  .complaint-card {
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: var(--card-shadow);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .complaint-card:hover {
+    transform: translateY(-10px);
+    box-shadow: var(--card-hover-shadow);
+  }
+
+  .complaint-card-header {
+    padding: 1.2rem 1.5rem;
+    color: white;
+  }
+
+  .complaint-card-header.status-pending {
+    background: var(--pending-gradient);
+  }
+
+  .complaint-card-header.status-in-progress {
+    background: var(--progress-gradient);
+  }
+
+  .complaint-card-header.status-resolved {
+    background: var(--resolved-gradient);
+  }
+
+  .complaint-id {
+    font-weight: 700;
+    font-size: 1.1rem;
+  }
+
+  .status-badge {
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .badge-pending {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+  }
+
+  .badge-in-progress {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+  }
+
+  .badge-resolved {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+  }
+
+  /* Image Section */
+  .complaint-image-section {
+    height: 200px;
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+  }
+
+  .complaint-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+
+  .complaint-image:hover {
+    transform: scale(1.05);
+  }
+
+  .no-image-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    color: #94a3b8;
+  }
+
+  .no-image-placeholder i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+  }
+
+  /* Card Body */
+  .complaint-card-body {
+    padding: 1.5rem;
+    flex-grow: 1;
+  }
+
+  .complaint-title {
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 0.8rem;
+    font-size: 1.2rem;
+  }
+
+  .complaint-description {
+    color: #64748b;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+  }
+
+  .result-section {
+    background: rgba(11, 163, 96, 0.05);
+    border-left: 4px solid #0ba360;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-top: auto;
+  }
+
+  .result-section h6 {
+    color: #0ba360;
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .result-text {
+    color: #334155;
+    font-size: 0.9rem;
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  /* Card Footer */
+  .complaint-card-footer {
+    padding: 1rem 1.5rem;
+    background: #f8fafc;
+    border-top: 1px solid #f1f5f9;
+  }
+
+  .date-info {
+    color: #64748b;
+    font-size: 0.85rem;
+  }
+
+  .btn-view-result {
+    background: var(--primary-gradient);
+    color: white;
+    border: none;
+    padding: 6px 15px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+  }
+
+  .btn-view-result:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+  }
+
+  /* Empty State */
+  .empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+  }
+
+  .empty-state-icon {
+    width: 100px;
+    height: 100px;
+    background: var(--primary-gradient);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 2rem;
+    font-size: 3rem;
+    color: white;
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+  }
+
+  .empty-state h3 {
+    color: #1e293b;
+    margin-bottom: 1rem;
+  }
+
+  .btn-primary {
+    background: var(--primary-gradient);
+    border: none;
+    padding: 12px 30px;
+    border-radius: 25px;
+    font-weight: 500;
+    box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3);
+    transition: all 0.3s ease;
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+  }
+
+  /* Modals */
+  .modal-content {
+    border-radius: 20px;
+    border: none;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+  }
+
+  .modal-header {
+    background: var(--primary-gradient);
+    color: white;
+    border-radius: 20px 20px 0 0;
+    padding: 1.5rem 2rem;
+  }
+
+  .modal-title {
+    font-weight: 600;
+  }
+
+  /* Animations */
+  .animate-on-hover {
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .dashboard-title {
+      font-size: 2rem;
+    }
+    
+    .complaint-card {
+      margin-bottom: 1.5rem;
+    }
+    
+    .complaint-image-section {
+      height: 180px;
+    }
+    
+    .empty-state {
+      padding: 3rem 1rem;
+    }
+    
+    .empty-state-icon {
+      width: 80px;
+      height: 80px;
+      font-size: 2.5rem;
+    }
+  }
+</style>
+
+<!-- Add smooth scroll and hover effects -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Add hover animation to all cards
+    const cards = document.querySelectorAll('.animate-on-hover');
+    
+    cards.forEach(card => {
+      card.addEventListener('mouseenter', function() {
+        this.style.transform = 'translateY(-10px)';
+      });
+      
+      card.addEventListener('mouseleave', function() {
+        this.style.transform = 'translateY(0)';
+      });
+    });
+    
+    // Add click effect to view result buttons
+    const viewResultBtns = document.querySelectorAll('.btn-view-result');
+    viewResultBtns.forEach(btn => {
+      btn.addEventListener('click', function() {
+        this.style.transform = 'scale(0.95)';
+        setTimeout(() => {
+          this.style.transform = '';
+        }, 150);
+      });
+    });
+    
+    // Make entire card clickable for image preview
+    const complaintImages = document.querySelectorAll('.complaint-image');
+    complaintImages.forEach(img => {
+      img.parentElement.style.cursor = 'pointer';
+    });
+  });
+</script>
+
+{% endblock %}
